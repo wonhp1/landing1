@@ -7,6 +7,12 @@ const getKSTDate = (date = new Date()) => {
     return new Date(utc + (kstOffset * 60000));
 };
 
+const formatDateToKST = (dateString) => {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() + 9);
+    return date.toISOString().split('T')[0];
+};
+
 const MemberAdminPage = () => {
     const [name, setName] = useState('');
     const [memberId, setMemberId] = useState('');
@@ -22,15 +28,24 @@ const MemberAdminPage = () => {
     firstDay.setHours(0, 0, 0, 0);
     lastDay.setHours(23, 59, 59, 999);
 
-    const [startDate, setStartDate] = useState(firstDay.toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(lastDay.toISOString().split('T')[0]);
+    const [startDate, setStartDate] = useState(formatDateToKST(firstDay.toISOString()));
+    const [endDate, setEndDate] = useState(formatDateToKST(lastDay.toISOString()));
     const [statistics, setStatistics] = useState([]);
     const [statisticsError, setStatisticsError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
 
     useEffect(() => {
-        // 페이지 로드 시 인증 상태 확인
+        const today = getKSTDate();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+        firstDay.setHours(0, 0, 0, 0);
+        lastDay.setHours(23, 59, 59, 999);
+
+        setStartDate(formatDateToKST(firstDay.toISOString()));
+        setEndDate(formatDateToKST(lastDay.toISOString()));
+
         const checkAuth = async () => {
             try {
                 const response = await fetch('/api/auth/check-auth');
@@ -46,7 +61,6 @@ const MemberAdminPage = () => {
 
         checkAuth();
 
-        // 페이지 이탈 시 이벤트 리스너
         const handleBeforeUnload = () => {
             fetch('/api/auth/logout');
         };
@@ -68,12 +82,14 @@ const MemberAdminPage = () => {
         try {
             const start = new Date(startDate);
             start.setHours(0, 0, 0, 0);
+            const startKST = new Date(start.getTime() - (start.getTimezoneOffset() * 60000));
             
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999);
+            const endKST = new Date(end.getTime() - (end.getTimezoneOffset() * 60000));
 
             const response = await fetch(
-                `/api/members/statistics?startDate=${start.toISOString()}&endDate=${end.toISOString()}&searchKeyword=${searchKeyword}`
+                `/api/members/statistics?startDate=${startKST.toISOString()}&endDate=${endKST.toISOString()}&searchKeyword=${searchKeyword}`
             );
             const data = await response.json();
             
@@ -125,13 +141,17 @@ const MemberAdminPage = () => {
     };
 
     const handleDateChange = (e, isStart) => {
-        const date = new Date(e.target.value);
+        const selectedDate = new Date(e.target.value);
+        const kstDate = formatDateToKST(selectedDate.toISOString());
+        
         if (isStart) {
-            date.setHours(0, 0, 0, 0);
-            setStartDate(date.toISOString().split('T')[0]);
+            const startDateTime = new Date(kstDate);
+            startDateTime.setHours(0, 0, 0, 0);
+            setStartDate(kstDate);
         } else {
-            date.setHours(23, 59, 59, 999);
-            setEndDate(date.toISOString().split('T')[0]);
+            const endDateTime = new Date(kstDate);
+            endDateTime.setHours(23, 59, 59, 999);
+            setEndDate(kstDate);
         }
     };
 
