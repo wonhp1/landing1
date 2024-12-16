@@ -1,0 +1,27 @@
+{
+  "disabledDates": [],
+  "holidays": [],
+  "availableHours": {
+    "weekday": {
+      "start": "14",
+      "end": "22"
+    },
+    "weekend": {
+      "start": "10",
+      "end": "17"
+    },
+    "holiday": {
+      "start": "10",
+      "end": "17"
+    },
+    "notice": "* 예약 가능 시간\n평일 - 오후 2시 ~ 오후 10시\n주말 - 오전 10시 ~ 오후 5시",
+    "sameDay": {
+      "enabled": true,
+      "minHoursAfter": 2
+    }
+  },
+  "reservationPeriod": {
+    "startDate": null,
+    "endDate": null
+  }
+} 

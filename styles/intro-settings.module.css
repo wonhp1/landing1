@@ -1,0 +1,596 @@
+.container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.textarea {
+    min-height: 150px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    width: 66%;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: 0;
+}
+
+.fileInput {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.imagePreview {
+    max-width: 200px;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+.submitButton {
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submitButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .textarea {
+        width: 100%;
+        min-height: 100px;
+    }
+    
+    .imagePreview {
+        max-width: 150px;
+    }
+} 
+
+.error {
+    color: #ff0000;
+    margin: 10px 0;
+}
+
+.success {
+    color: #00aa00;
+    margin: 10px 0;
+}
+
+.input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 66%;
+    margin-bottom: 10px;
+}
+
+.imagePreviewContainer {
+    margin-top: 10px;
+    max-width: 300px;
+}
+
+.imagePreview {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    display: none;
+}
+
+.sectionContainer {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.addButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.removeButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.videoContainer {
+    margin-top: 10px;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 비율 */
+    height: 0;
+    overflow: hidden;
+}
+
+.videoPreview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.moveButton {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 0 2px;
+    cursor: pointer;
+}
+
+.moveButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.backButton {
+    background-color: #6c757d;
+    color: white;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.backButton:hover {
+    background-color: #5a6268;
+}
+
+.contentControls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.addButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.addButton:hover {
+    background-color: #218838;
+}
+
+.backButtonLink {
+    text-decoration: none;
+}
+
+.urlInput {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 66%;
+    margin-bottom: 10px;
+}
+
+.colorInput {
+    width: 100px;
+    height: 40px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.previewContainer {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: visible;
+    position: relative;
+    background-color: white;
+}
+
+.previewHeader {
+    padding: 15px;
+    text-align: center;
+    border-radius: 10px;
+    margin: 15px;
+    position: relative;
+    background-color: inherit;
+    font-family: inherit;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.previewContents {
+    padding: 15px;
+    overflow: visible;
+}
+
+.previewItem {
+    position: relative;
+    margin-bottom: 15px;
+    overflow: visible;
+}
+
+.previewControls {
+    position: absolute;
+    top: 50%;
+    right: -40px;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 5px;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.2s;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.previewItem:hover .previewControls {
+    opacity: 1;
+}
+
+.moveButton, .editButton, .removeButton {
+    padding: 3px 8px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: white;
+    font-family: inherit;
+}
+
+.moveButton {
+    background-color: #6c757d;
+}
+
+.moveButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.editButton {
+    background-color: #28a745;
+}
+
+.removeButton {
+    background-color: #dc3545;
+}
+
+.previewButton {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.previewSection {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.previewImageContainer,
+.previewVideoContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.imageWrapper {
+    width: 100%;
+    position: relative;
+}
+
+.previewImage {
+    width: 100%;
+    height: auto;
+    display: block;
+    vertical-align: bottom;
+}
+
+.videoWrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+}
+
+.previewVideo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.previewCaption {
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    box-sizing: border-box;
+    background-color: inherit;
+    color: inherit;
+}
+
+.contentControls {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+.addButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.addButton:hover {
+    background-color: #0056b3;
+}
+
+.submitButton {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.submitButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.error {
+    color: #dc3545;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.success {
+    color: #28a745;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .previewContainer {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        margin: 20px -15px;
+        width: calc(100% + 30px);
+    }
+
+    .previewControls {
+        right: 5px;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .contentControls {
+        flex-direction: column;
+    }
+
+    .addButton {
+        width: 100%;
+    }
+
+    .submitButton {
+        width: 100%;
+    }
+}
+
+.previewText {
+    padding: 20px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.settingsSection {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.settingsSection h2 {
+    margin: 0 0 20px 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modalTitle {
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.modalBody {
+    margin-bottom: 20px;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.saveButton, .cancelButton {
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+}
+
+.saveButton {
+    background-color: #007bff;
+    color: white;
+}
+
+.cancelButton {
+    background-color: #6c757d;
+    color: white;
+}
+
+.input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.5;
+}
+
+.textarea {
+    min-height: 60px;
+    resize: vertical;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.previewHeader {
+    padding: 15px;
+    text-align: center;
+    border-radius: 10px;
+    margin: 15px;
+    position: relative;
+    background-color: inherit;
+    font-family: inherit;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.previewText {
+    padding: 20px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: center;
+    border-radius: 10px;
+}
+
+/* 줄바꿈 관련 스타일 수정 */
+.previewText, 
+.previewHeader,
+.previewButton,
+.previewCaption {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
