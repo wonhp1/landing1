@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
+const getKSTDate = (date = new Date()) => {
+    const kstOffset = 9 * 60;
+    const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+    return new Date(utc + (kstOffset * 60000));
+};
+
 const MemberAdminPage = () => {
     const [name, setName] = useState('');
     const [memberId, setMemberId] = useState('');
@@ -9,9 +15,12 @@ const MemberAdminPage = () => {
     const [messageType, setMessageType] = useState('');
     const router = useRouter();
 
-    const today = new Date();
+    const today = getKSTDate();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    firstDay.setHours(0, 0, 0, 0);
+    lastDay.setHours(23, 59, 59, 999);
 
     const [startDate, setStartDate] = useState(firstDay.toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState(lastDay.toISOString().split('T')[0]);
@@ -54,10 +63,17 @@ const MemberAdminPage = () => {
             setStatisticsError('시작일이 종료일보다 늦을 수 없습니다.');
             return;
         }
+
         setIsLoading(true);
         try {
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+
             const response = await fetch(
-                `/api/members/statistics?startDate=${startDate}&endDate=${endDate}&searchKeyword=${searchKeyword}`
+                `/api/members/statistics?startDate=${start.toISOString()}&endDate=${end.toISOString()}&searchKeyword=${searchKeyword}`
             );
             const data = await response.json();
             
@@ -108,6 +124,17 @@ const MemberAdminPage = () => {
         }
     };
 
+    const handleDateChange = (e, isStart) => {
+        const date = new Date(e.target.value);
+        if (isStart) {
+            date.setHours(0, 0, 0, 0);
+            setStartDate(date.toISOString().split('T')[0]);
+        } else {
+            date.setHours(23, 59, 59, 999);
+            setEndDate(date.toISOString().split('T')[0]);
+        }
+    };
+
     return (
         <div className="container">
             <h1>유효회원 관리</h1>
@@ -149,7 +176,7 @@ const MemberAdminPage = () => {
                                 <input
                                     type="date"
                                     value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
+                                    onChange={(e) => handleDateChange(e, true)}
                                 />
                             </div>
                             <div className="date-input">
@@ -157,7 +184,7 @@ const MemberAdminPage = () => {
                                 <input
                                     type="date"
                                     value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
+                                    onChange={(e) => handleDateChange(e, false)}
                                 />
                             </div>
                         </div>
