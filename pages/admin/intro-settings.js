@@ -79,24 +79,31 @@ const IntroSettings = () => {
                     }
                 ];
 
-                let initialContents;
-                if (data.contents) {
-                    initialContents = data.contents;
-                } else {
-                    initialContents = defaultContents;
-                }
-
-                setContents(initialContents);
-                setPageSettings(data.pageSettings || {
+                const defaultPageSettings = {
                     backgroundColor: '#ffffff',
                     headerBackgroundColor: '#ffffff',
                     headerTextColor: '#000000',
                     headerFontSize: '1.2rem',
                     headerFontWeight: 'normal',
                     headerText: '제목없음'
-                });
+                };
+
+                // 데이터가 없거나 빈 객체인 경우 기본값 사용
+                setContents(!data.contents || Object.keys(data.contents).length === 0 
+                    ? defaultContents 
+                    : data.contents
+                );
+                
+                setPageSettings(!data.pageSettings || Object.keys(data.pageSettings).length === 0
+                    ? defaultPageSettings
+                    : data.pageSettings
+                );
+
             } catch (error) {
                 console.error('Error fetching settings:', error);
+                // 에러 발생시 기본값 사용
+                setContents(defaultContents);
+                setPageSettings(defaultPageSettings);
             }
         };
 
