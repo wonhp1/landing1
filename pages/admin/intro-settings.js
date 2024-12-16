@@ -19,7 +19,7 @@ const IntroSettings = () => {
         headerTextColor: '#000000',
         headerFontSize: '1.2rem',
         headerFontWeight: 'normal',
-        headerText: '제목을 입력하세요'
+        headerText: '제목없음'
     });
     const [editingPageSettings, setEditingPageSettings] = useState(false);
 
@@ -29,7 +29,7 @@ const IntroSettings = () => {
                 const response = await fetch('/api/intro-content');
                 const data = await response.json();
                 
-                // 기본값 설정
+                // 기본값 수정
                 const defaultContents = [
                     {
                         id: 1,
@@ -59,6 +59,17 @@ const IntroSettings = () => {
                     },
                     {
                         id: 3,
+                        contentType: 'section',
+                        type: 'text',
+                        content: '',
+                        backgroundColor: '#ffffff',
+                        borderColor: '#ffffff',
+                        textColor: '#000000',
+                        fontSize: '1rem',
+                        fontWeight: 'normal'
+                    },
+                    {
+                        id: 4,
                         contentType: 'button',
                         text: '새 버튼',
                         url: '/',
@@ -82,7 +93,7 @@ const IntroSettings = () => {
                     headerTextColor: '#000000',
                     headerFontSize: '1.2rem',
                     headerFontWeight: 'normal',
-                    headerText: '제목을 입력하세요'
+                    headerText: '제목없음'
                 });
             } catch (error) {
                 console.error('Error fetching settings:', error);
