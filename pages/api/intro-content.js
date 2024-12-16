@@ -66,37 +66,67 @@ const DEFAULT_CONTENT = {
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
-            // 파일이 없거나 빈 경우 기본값 반환
+            // 1. 파일이 없는 경우
             if (!fs.existsSync(filePath)) {
                 return res.status(200).json(DEFAULT_CONTENT);
             }
 
+            // 2. 파일 읽기
             const fileData = fs.readFileSync(filePath, 'utf8');
             let introContent;
             
+            // 3. JSON 파싱
             try {
                 introContent = JSON.parse(fileData);
             } catch (e) {
-                // JSON 파싱 실패시 기본값 반환
                 return res.status(200).json(DEFAULT_CONTENT);
             }
 
-            // 데이터가 없거나 불완전한 경우 기본값 반환
-            if (!introContent || !introContent.contents || !introContent.pageSettings) {
-                return res.status(200).json(DEFAULT_CONTENT);
+            // 4. 데이터 구조 검증 및 변환
+            if (!introContent.contents || !introContent.pageSettings) {
+                // 기존 형식을 새 형식으로 변환
+                const newContent = {
+                    pageSettings: introContent.pageSettings || DEFAULT_CONTENT.pageSettings,
+                    contents: []
+                };
+
+                // 기존 sections이 있으면 변환
+                if (introContent.sections) {
+                    newContent.contents.push(...introContent.sections.map(section => ({
+                        ...section,
+                        contentType: 'section'
+                    })));
+                }
+
+                // 기존 buttons이 있으면 변환
+                if (introContent.buttons) {
+                    newContent.contents.push(...introContent.buttons.map(button => ({
+                        ...button,
+                        contentType: 'button'
+                    })));
+                }
+
+                // 변환된 데이터가 없으면 기본값 사용
+                if (newContent.contents.length === 0) {
+                    return res.status(200).json(DEFAULT_CONTENT);
+                }
+
+                // 변환된 데이터 저장
+                fs.writeFileSync(filePath, JSON.stringify(newContent, null, 2));
+                return res.status(200).json(newContent);
             }
 
+            // 5. 정상적인 데이터 반환
             res.status(200).json(introContent);
         } catch (error) {
             console.error('Error reading intro content:', error);
-            // 에러 발생시 기본값 반환
             res.status(200).json(DEFAULT_CONTENT);
         }
     } else if (req.method === 'POST') {
         try {
             const content = req.body;
             
-            // 데이터 유효성 검사 추가
+            // 데이터 유효성 검사
             if (!content.contents || !Array.isArray(content.contents)) {
                 return res.status(400).json({ error: '잘못된 데이터 형식입니다.' });
             }
@@ -108,18 +138,22 @@ export default async function handler(req, res) {
                 }
             }
 
-            // data 디렉토리가 없으면 생성
+            // data 디렉토리 생성
             const dataDir = path.join(process.cwd(), 'data');
             if (!fs.existsSync(dataDir)) {
                 fs.mkdirSync(dataDir);
             }
 
-            // contents 배열로 저장
+            // 저장할 데이터 구성
             const dataToSave = {
-                pageSettings: content.pageSettings,
+                pageSettings: {
+                    ...DEFAULT_CONTENT.pageSettings,
+                    ...content.pageSettings
+                },
                 contents: content.contents
             };
 
+            // 파일 저장
             fs.writeFileSync(filePath, JSON.stringify(dataToSave, null, 2));
             res.status(200).json({ message: '성공적으로 저장되었습니다.' });
         } catch (error) {
