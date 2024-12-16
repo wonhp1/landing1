@@ -16,7 +16,7 @@ const Home = () => {
         headerTextColor: '#000000',
         headerFontSize: '1.2rem',
         headerFontWeight: 'normal',
-        headerText: '메인 제목'
+        headerText: '제목없음'
     });
 
     useEffect(() => {
@@ -24,6 +24,20 @@ const Home = () => {
             try {
                 const response = await fetch('/api/intro-content');
                 const data = await response.json();
+                
+                if (!data || !data.contents || data.contents.length === 0) {
+                    setContents([]);
+                    setPageSettings({
+                        backgroundColor: '#ffffff',
+                        headerBackgroundColor: '#ffffff',
+                        headerTextColor: '#000000',
+                        headerFontSize: '1.2rem',
+                        headerFontWeight: 'normal',
+                        headerText: '제목없음'
+                    });
+                    return;
+                }
+
                 setContents(data.contents || []);
                 setPageSettings(data.pageSettings || {
                     backgroundColor: '#ffffff',
@@ -31,10 +45,19 @@ const Home = () => {
                     headerTextColor: '#000000',
                     headerFontSize: '1.2rem',
                     headerFontWeight: 'normal',
-                    headerText: '메인 제목'
+                    headerText: '제목없음'
                 });
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setContents([]);
+                setPageSettings({
+                    backgroundColor: '#ffffff',
+                    headerBackgroundColor: '#ffffff',
+                    headerTextColor: '#000000',
+                    headerFontSize: '1.2rem',
+                    headerFontWeight: 'normal',
+                    headerText: '제목없음'
+                });
             }
         };
 

@@ -3,7 +3,7 @@ import path from 'path';
 
 const filePath = path.join(process.cwd(), 'data', 'intro-content.json');
 
-// 기본값을 상수로 분리
+// 기본값을 상수로 분리하고 더 엄격하게 정의
 const DEFAULT_CONTENT = {
     pageSettings: {
         backgroundColor: '#ffffff',
@@ -66,34 +66,31 @@ const DEFAULT_CONTENT = {
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
-            // 파일이 없는 경우 기본값 반환
+            // 파일이 없거나 빈 경우 기본값 반환
             if (!fs.existsSync(filePath)) {
                 return res.status(200).json(DEFAULT_CONTENT);
             }
 
             const fileData = fs.readFileSync(filePath, 'utf8');
-            const introContent = JSON.parse(fileData);
+            let introContent;
             
-            // 기존 데이터를 새로운 형식으로 변환
-            if (!introContent.contents) {
-                introContent.contents = [
-                    ...(introContent.sections || []).map(section => ({
-                        ...section,
-                        contentType: 'section'
-                    })),
-                    ...(introContent.buttons || []).map(button => ({
-                        ...button,
-                        contentType: 'button'
-                    }))
-                ];
-                delete introContent.sections;
-                delete introContent.buttons;
+            try {
+                introContent = JSON.parse(fileData);
+            } catch (e) {
+                // JSON 파싱 실패시 기본값 반환
+                return res.status(200).json(DEFAULT_CONTENT);
+            }
+
+            // 데이터가 없거나 불완전한 경우 기본값 반환
+            if (!introContent || !introContent.contents || !introContent.pageSettings) {
+                return res.status(200).json(DEFAULT_CONTENT);
             }
 
             res.status(200).json(introContent);
         } catch (error) {
             console.error('Error reading intro content:', error);
-            res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+            // 에러 발생시 기본값 반환
+            res.status(200).json(DEFAULT_CONTENT);
         }
     } else if (req.method === 'POST') {
         try {

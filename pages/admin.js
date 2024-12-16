@@ -60,18 +60,6 @@ const Admin = () => {
             </div>
             
             <div className={styles.buttonContainer}>
-                <Link href="/admin/exercise-log">
-                    <button className={styles.button}>운동일지 관리</button>
-                </Link>
-                <Link href="/admin/meal-log">
-                    <button className={styles.button}>식사일지 관리</button>
-                </Link>
-                <Link href="/admin/inbody-log">
-                    <button className={styles.button}>인바디 기록 관리</button>
-                </Link>
-                <Link href="/admin/sales">
-                    <button className={styles.button}>매출 관리</button>
-                </Link>
                 <Link href="/admin/reservation-admin">
                     <button className={styles.button}>예약 관리</button>
                 </Link>
