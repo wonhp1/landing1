@@ -3,47 +3,72 @@ import path from 'path';
 
 const filePath = path.join(process.cwd(), 'data', 'intro-content.json');
 
+// 기본값을 상수로 분리
+const DEFAULT_CONTENT = {
+    pageSettings: {
+        backgroundColor: '#ffffff',
+        headerBackgroundColor: '#ffffff',
+        headerTextColor: '#000000',
+        headerFontSize: '1.2rem',
+        headerFontWeight: 'normal',
+        headerText: '제목없음'
+    },
+    contents: [
+        {
+            id: 1,
+            contentType: 'section',
+            type: 'image',
+            content: '',
+            backgroundColor: '#ffffff',
+            borderColor: '#ffffff',
+            caption: '',
+            captionBackgroundColor: '#000000',
+            captionTextColor: '#ffffff',
+            captionBorderColor: '#000000',
+            url: ''
+        },
+        {
+            id: 2,
+            contentType: 'section',
+            type: 'video',
+            content: '',
+            backgroundColor: '#ffffff',
+            borderColor: '#ffffff',
+            caption: '',
+            captionBackgroundColor: '#000000',
+            captionTextColor: '#ffffff',
+            captionBorderColor: '#000000',
+            url: ''
+        },
+        {
+            id: 3,
+            contentType: 'section',
+            type: 'text',
+            content: '',
+            backgroundColor: '#ffffff',
+            borderColor: '#ffffff',
+            textColor: '#000000',
+            fontSize: '1rem',
+            fontWeight: 'normal'
+        },
+        {
+            id: 4,
+            contentType: 'button',
+            text: '새 버튼',
+            url: '/',
+            backgroundColor: '#ffffff',
+            textColor: '#000000',
+            borderColor: '#e0e0e0'
+        }
+    ]
+};
+
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
             // 파일이 없는 경우 기본값 반환
             if (!fs.existsSync(filePath)) {
-                return res.status(200).json({
-                    pageSettings: {
-                        backgroundColor: '#ffffff',
-                        headerBackgroundColor: '#ffffff',
-                        headerTextColor: '#000000',
-                        headerFontSize: '1.2rem',
-                        headerFontWeight: 'normal',
-                        headerText: '메인 제목'
-                    },
-                    contents: [
-                        {
-                            id: 1,
-                            contentType: 'button',
-                            text: '⏰ 스케줄 예약 및 변경 ⏰',
-                            url: '/reservations'
-                        },
-                        {
-                            id: 2,
-                            contentType: 'button',
-                            text: '📝 운동일지 조회 💪',
-                            url: '/exercise-log'
-                        },
-                        {
-                            id: 3,
-                            contentType: 'button',
-                            text: '🥄 식사일지 조회 🥢',
-                            url: '/meal-log'
-                        },
-                        {
-                            id: 4,
-                            contentType: 'button',
-                            text: '📋 인바디 조회 📋',
-                            url: '/my-inbody'
-                        }
-                    ]
-                });
+                return res.status(200).json(DEFAULT_CONTENT);
             }
 
             const fileData = fs.readFileSync(filePath, 'utf8');
