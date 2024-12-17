@@ -34,6 +34,8 @@ const MemberAdminPage = () => {
     const [statisticsError, setStatisticsError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
+    const [validationEnabled, setValidationEnabled] = useState(true);
+    const [isSettingLoading, setIsSettingLoading] = useState(false);
 
     useEffect(() => {
         const today = getKSTDate();
@@ -66,6 +68,21 @@ const MemberAdminPage = () => {
         };
 
         window.addEventListener('beforeunload', handleBeforeUnload);
+
+        // 회원 검증 설정 불러오기
+        const loadValidationSetting = async () => {
+            try {
+                const response = await fetch('/api/settings/member-validation');
+                if (response.ok) {
+                    const data = await response.json();
+                    setValidationEnabled(data.enabled);
+                }
+            } catch (error) {
+                console.error('설정 로드 중 오류 발생:', error);
+            }
+        };
+
+        loadValidationSetting();
 
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -152,6 +169,40 @@ const MemberAdminPage = () => {
             const endDateTime = new Date(kstDate);
             endDateTime.setHours(23, 59, 59, 999);
             setEndDate(kstDate);
+        }
+    };
+
+    const handleValidationToggle = async () => {
+        setIsSettingLoading(true);
+        try {
+            const response = await fetch('/api/settings/member-validation', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    enabled: !validationEnabled
+                }),
+            });
+
+            if (response.ok) {
+                setValidationEnabled(!validationEnabled);
+                setMessage('설정이 저장되었습니다.');
+                setMessageType('success');
+                setShowMessage(true);
+                setTimeout(() => {
+                    setShowMessage(false);
+                }, 3000);
+            } else {
+                throw new Error('설정 저장 실패');
+            }
+        } catch (error) {
+            console.error('설정 저장 중 오류 발생:', error);
+            setMessage('설정 저장 중 오류가 발생했습니다.');
+            setMessageType('error');
+            setShowMessage(true);
+        } finally {
+            setIsSettingLoading(false);
         }
     };
 
@@ -268,6 +319,30 @@ const MemberAdminPage = () => {
                         </div>
                     )}
                 </div>
+            </div>
+
+            <div className="validation-setting">
+                <h2>회원 검증 설정</h2>
+                <div className="toggle-container">
+                    <label className="toggle-switch">
+                        <input
+                            type="checkbox"
+                            checked={validationEnabled}
+                            onChange={handleValidationToggle}
+                            disabled={isSettingLoading}
+                        />
+                        <span className="toggle-slider"></span>
+                    </label>
+                    <span className="toggle-label">
+                        회원 검증 {validationEnabled ? '활성화' : '비활성화'}
+                    </span>
+                    {isSettingLoading && <span className="loading-indicator">저장 중...</span>}
+                </div>
+                <p className="setting-description">
+                    {validationEnabled 
+                        ? '예약 시 유효회원 여부를 확인합니다.' 
+                        : '예약 시 유효회원 확인을 건너뜁니다.'}
+                </p>
             </div>
 
             {showMessage && (
@@ -561,6 +636,88 @@ const MemberAdminPage = () => {
                     font-weight: bold;
                     color: #1a73e8;
                     text-align: right;
+                }
+
+                .validation-setting {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    margin-bottom: 20px;
+                }
+
+                .toggle-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    margin: 15px 0;
+                }
+
+                .toggle-switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 60px;
+                    height: 34px;
+                }
+
+                .toggle-switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                .toggle-slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    transition: .4s;
+                    border-radius: 34px;
+                }
+
+                .toggle-slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 26px;
+                    width: 26px;
+                    left: 4px;
+                    bottom: 4px;
+                    background-color: white;
+                    transition: .4s;
+                    border-radius: 50%;
+                }
+
+                input:checked + .toggle-slider {
+                    background-color: #1a73e8;
+                }
+
+                input:disabled + .toggle-slider {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                input:checked + .toggle-slider:before {
+                    transform: translateX(26px);
+                }
+
+                .toggle-label {
+                    font-size: 1rem;
+                    color: #333;
+                }
+
+                .setting-description {
+                    color: #666;
+                    font-size: 0.9rem;
+                    margin-top: 10px;
+                }
+
+                .loading-indicator {
+                    color: #666;
+                    font-size: 0.9rem;
+                    margin-left: 10px;
                 }
             `}</style>
         </div>

@@ -12,17 +12,33 @@ const auth = new google.auth.GoogleAuth({
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         try {
+            const sheets = google.sheets({ version: 'v4', auth: await auth.getClient() });
+
+            // 회원 검증 설정 확인
+            const settingsResponse = await sheets.spreadsheets.values.get({
+                spreadsheetId: process.env.GOOGLE_SHEET_ID,
+                range: 'settings!A1:B1',
+            });
+
+            const settings = settingsResponse.data.values?.[0] || ['memberValidation', 'true'];
+            const validationEnabled = settings[1] === 'true';
+
+            // 검증이 비활성화되어 있으면 항상 true 반환
+            if (!validationEnabled) {
+                return res.status(200).json({ 
+                    isValid: true 
+                });
+            }
+
+            // 기존 검증 로직...
             const { name, memberId } = req.body;
 
-            // 입력값 검증
             if (!name || !memberId) {
                 return res.status(400).json({ 
                     isValid: false, 
                     message: '이름과 회원번호를 모두 입력해주세요.' 
                 });
             }
-
-            const sheets = google.sheets({ version: 'v4', auth: await auth.getClient() });
 
             // 회원 정보 조회
             const response = await sheets.spreadsheets.values.get({
