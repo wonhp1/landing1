@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
     try {
         const sheets = google.sheets({ version: 'v4', auth: await auth.getClient() });
-        const settingsRange = 'settings!A1:B1';
+        const settingsRange = 'member_list!D1:E1';
 
         if (req.method === 'GET') {
             const response = await sheets.spreadsheets.values.get({
