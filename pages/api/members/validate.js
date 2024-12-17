@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             // 회원 검증 설정 확인
             const settingsResponse = await sheets.spreadsheets.values.get({
                 spreadsheetId: process.env.GOOGLE_SHEET_ID,
-                range: 'settings!A1:B1',
+                range: 'member_list!D1:E1',
             });
 
             const settings = settingsResponse.data.values?.[0] || ['memberValidation', 'true'];
