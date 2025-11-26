@@ -90,16 +90,17 @@ export default function OrderPage() {
 
         new window.daum.Postcode({
             oncomplete: function (data) {
-                let addr = ''; // 주소
+                let addr = ''; // 주소 (도로명 우선)
                 let extraAddr = ''; // 참고항목
 
-                if (data.userSelectedType === 'R') {
+                // 도로명 주소가 있으면 항상 도로명으로, 없을 때만 지번 사용
+                if (data.roadAddress) {
                     addr = data.roadAddress;
                 } else {
                     addr = data.jibunAddress;
                 }
 
-                if (data.userSelectedType === 'R') {
+                if (data.roadAddress) {
                     if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
                         extraAddr += data.bname;
                     }
