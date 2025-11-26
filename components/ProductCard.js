@@ -18,9 +18,16 @@ export default function ProductCard({ product, onSelect }) {
                 </div>
                 <p className={styles.description}>{product.description}</p>
                 <div className={styles.footer}>
-                    <span className={styles.price}>
-                        {product.price.toLocaleString()}원
-                    </span>
+                    <div className={styles.priceContainer}>
+                        {product.weight > 0 && (
+                            <span className={styles.weight} style={{ fontSize: '12px', color: '#666' }}>
+                                {product.weight}g
+                            </span>
+                        )}
+                        <span className={styles.price}>
+                            {product.price.toLocaleString()}원
+                        </span>
+                    </div>
                     {onSelect && (
                         <button
                             className={styles.button}

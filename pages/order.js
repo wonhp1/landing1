@@ -50,7 +50,13 @@ export default function OrderPage() {
                 p.productId === product.id ? { ...p, quantity: p.quantity + 1 } : p
             ));
         } else {
-            setSelectedProducts([...selectedProducts, { productId: product.id, quantity: 1, name: product.name, price: product.price }]);
+            setSelectedProducts([...selectedProducts, {
+                productId: product.id,
+                quantity: 1,
+                name: product.name,
+                price: product.price,
+                weight: product.weight || 0
+            }]);
         }
     };
 
@@ -242,7 +248,14 @@ export default function OrderPage() {
                             padding: '10px 0',
                             borderBottom: '1px solid #eee'
                         }}>
-                            <span>{product.name}</span>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span>{product.name}</span>
+                                {product.weight > 0 && (
+                                    <span style={{ fontSize: '12px', color: '#666' }}>
+                                        {product.weight}g x {product.quantity}개 = {(product.weight * product.quantity).toLocaleString()}g
+                                    </span>
+                                )}
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <button
                                     onClick={() => handleQuantityChange(product.productId, -1)}
@@ -302,7 +315,7 @@ export default function OrderPage() {
                     <button
                         type="button"
                         className="button"
-                        style={{ padding: '4px 10px', fontSize: '13px' }}
+                        style={{ padding: '8px 16px', fontSize: '14px' }}
                         onClick={handleFindAddress}
                     >
                         주소 찾기

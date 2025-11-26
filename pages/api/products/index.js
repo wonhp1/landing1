@@ -11,7 +11,7 @@ async function handler(req, res) {
 
     if (req.method === 'POST') {
         // 새 상품 생성 (관리자 전용)
-        const { name, description, price, imageUrl, available = true, category } = req.body;
+        const { name, description, price, imageUrl, available = true, category, weight } = req.body;
 
         if (!name || !price) {
             return res.status(400).json({ error: '상품명과 가격은 필수입니다.' });
@@ -25,6 +25,7 @@ async function handler(req, res) {
             imageUrl: imageUrl || '',
             available,
             category: category && category.trim() ? category.trim() : '기타',
+            weight: weight ? Number(weight) : 0,
             createdAt: new Date().toISOString()
         };
 

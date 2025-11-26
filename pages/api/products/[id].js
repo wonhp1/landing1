@@ -17,7 +17,7 @@ async function handler(req, res) {
 
     if (req.method === 'PUT') {
         // 상품 수정 (관리자 전용)
-        const { name, description, price, imageUrl, available, category } = req.body;
+        const { name, description, price, imageUrl, available, category, weight } = req.body;
 
         const updatedProduct = {
             ...products[productIndex],
@@ -29,6 +29,7 @@ async function handler(req, res) {
             ...(category !== undefined && {
                 category: category && category.trim() ? category.trim() : '기타'
             }),
+            ...(weight !== undefined && { weight: Number(weight) }),
             updatedAt: new Date().toISOString()
         };
 

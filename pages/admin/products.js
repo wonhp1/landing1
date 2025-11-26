@@ -16,7 +16,8 @@ export default function AdminProducts() {
         price: '',
         imageUrl: '',
         available: true,
-        category: CATEGORY_OPTIONS[0]
+        category: CATEGORY_OPTIONS[0],
+        weight: ''
     });
 
     useEffect(() => {
@@ -54,7 +55,8 @@ export default function AdminProducts() {
                 price: product.price,
                 imageUrl: product.imageUrl,
                 available: product.available,
-                category: product.category || '기타'
+                category: product.category || '기타',
+                weight: product.weight || ''
             });
         } else {
             setEditingProduct(null);
@@ -64,7 +66,8 @@ export default function AdminProducts() {
                 price: '',
                 imageUrl: '',
                 available: true,
-                category: CATEGORY_OPTIONS[0]
+                category: CATEGORY_OPTIONS[0],
+                weight: ''
             });
         }
         setIsModalOpen(true);
@@ -136,6 +139,7 @@ export default function AdminProducts() {
                                 <th>상품명</th>
                                 <th>구분</th>
                                 <th>가격</th>
+                                <th>중량(g)</th>
                                 <th>상태</th>
                                 <th>작업</th>
                             </tr>
@@ -151,6 +155,7 @@ export default function AdminProducts() {
                                     <td>{product.name}</td>
                                     <td>{product.category || '기타'}</td>
                                     <td>{product.price.toLocaleString()}원</td>
+                                    <td>{product.weight ? `${product.weight}g` : '-'}</td>
                                     <td>{product.available ? '판매중' : '품절'}</td>
                                     <td>
                                         <button
@@ -199,6 +204,13 @@ export default function AdminProducts() {
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         required
+                    />
+                    <input
+                        type="number"
+                        placeholder="중량 (g)"
+                        className="input"
+                        value={formData.weight}
+                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                     />
                     <input
                         type="url"
