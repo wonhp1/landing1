@@ -1,0 +1,24 @@
+[
+  {
+    "id": "product-1764163349035",
+    "name": "감자",
+    "description": "200g / 졸라맛있음 /",
+    "price": 2000,
+    "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
+    "available": true,
+    "category": "기타",
+    "createdAt": "2025-11-26T13:22:29.035Z",
+    "updatedAt": "2025-11-26T13:26:51.498Z"
+  },
+  {
+    "id": "product-1764163479649",
+    "name": "토마토",
+    "description": "400g / 졸라 달음 /",
+    "price": 3000,
+    "imageUrl": "https://won-n.notion.site/image/attachment%3A14f10f1b-461b-44f8-83db-54397a81d4b0%3Aimage.png?table=block&id=2b7a5c09-bf09-80f1-a47b-ec0177afc889&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=840&userId=&cache=v2",
+    "available": true,
+    "category": "야채",
+    "createdAt": "2025-11-26T13:24:39.649Z",
+    "updatedAt": "2025-11-26T13:27:03.341Z"
+  }
+]
