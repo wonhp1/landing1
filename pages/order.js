@@ -13,10 +13,8 @@ export default function OrderPage() {
         name: '',
         phone: '',
         postcode: '',
-        sido: '',
-        sigungu: '',
-        dong: '',
-        addressDetail: ''
+        mainAddress: '',
+        detailAddress: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState('');
@@ -117,11 +115,8 @@ export default function OrderPage() {
                 setCustomerInfo(prev => ({
                     ...prev,
                     postcode: data.zonecode || '',
-                    sido: data.sido || '',
-                    sigungu: data.sigungu || '',
-                    dong: data.bname || data.bname1 || '',
-                    // 선택한 도로명/지번 주소 전체를 기본 주소로 채워두고, 사용자가 뒤에 상세주소를 덧붙이도록 함
-                    addressDetail: fullAddress
+                    mainAddress: fullAddress,
+                    detailAddress: '' // 주소 검색 후 상세주소 초기화
                 }));
 
                 layer.style.display = 'none';
@@ -165,7 +160,7 @@ export default function OrderPage() {
                 body: JSON.stringify({
                     name: customerInfo.name,
                     phone: customerInfo.phone,
-                    address: `${customerInfo.postcode ? `(${customerInfo.postcode}) ` : ''}${customerInfo.sido} ${customerInfo.sigungu} ${customerInfo.dong} ${customerInfo.addressDetail}`.trim(),
+                    address: `${customerInfo.postcode ? `(${customerInfo.postcode}) ` : ''}${customerInfo.mainAddress} ${customerInfo.detailAddress}`.trim(),
                     products: selectedProducts.map(p => ({ productId: p.productId, quantity: p.quantity }))
                 }),
             });
@@ -177,10 +172,8 @@ export default function OrderPage() {
                     name: '',
                     phone: '',
                     postcode: '',
-                    sido: '',
-                    sigungu: '',
-                    dong: '',
-                    addressDetail: ''
+                    mainAddress: '',
+                    detailAddress: ''
                 });
 
                 setTimeout(() => {
@@ -303,7 +296,7 @@ export default function OrderPage() {
                     onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
                     required
                 />
-                {/* 주소: 다음 우편번호 API + 행정구역 + 상세주소 */}
+                {/* 주소: 다음 우편번호 API + 기본주소 + 상세주소 */}
                 <div style={{ marginTop: '10px', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>주소</span>
                     <button
@@ -325,34 +318,18 @@ export default function OrderPage() {
                 />
                 <input
                     type="text"
-                    placeholder="시/도 (예: 서울특별시)"
+                    placeholder="기본 주소"
                     className="input"
-                    value={customerInfo.sido}
-                    onChange={(e) => setCustomerInfo({ ...customerInfo, sido: e.target.value })}
+                    value={customerInfo.mainAddress}
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, mainAddress: e.target.value })}
                     readOnly
                 />
                 <input
                     type="text"
-                    placeholder="시군구 (예: 송파구)"
+                    placeholder="상세 주소 (건물명, 호수 등)"
                     className="input"
-                    value={customerInfo.sigungu}
-                    onChange={(e) => setCustomerInfo({ ...customerInfo, sigungu: e.target.value })}
-                    readOnly
-                />
-                <input
-                    type="text"
-                    placeholder="읍/면/동 (예: 가락1동)"
-                    className="input"
-                    value={customerInfo.dong}
-                    onChange={(e) => setCustomerInfo({ ...customerInfo, dong: e.target.value })}
-                    readOnly
-                />
-                <textarea
-                    placeholder="상세주소 (도로명, 건물명/호수 등)"
-                    className="input"
-                    rows="3"
-                    value={customerInfo.addressDetail}
-                    onChange={(e) => setCustomerInfo({ ...customerInfo, addressDetail: e.target.value })}
+                    value={customerInfo.detailAddress}
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, detailAddress: e.target.value })}
                 />
                 <button type="submit" className="button" disabled={isSubmitting}>
                     {isSubmitting ? '주문 중...' : '주문하기'}
