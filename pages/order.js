@@ -119,7 +119,8 @@ export default function OrderPage() {
                     sido: data.sido || '',
                     sigungu: data.sigungu || '',
                     dong: data.bname || data.bname1 || '',
-                    addressDetail: prev.addressDetail
+                    // 선택한 도로명/지번 주소 전체를 기본 주소로 채워두고, 사용자가 뒤에 상세주소를 덧붙이도록 함
+                    addressDetail: fullAddress
                 }));
 
                 layer.style.display = 'none';
