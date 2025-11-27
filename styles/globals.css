@@ -1,3 +1,14 @@
+:root {
+  --banana-yellow: #F4D03F;
+  --banana-dark: #333333;
+  --banana-light: #FAFAFA;
+  --banana-white: #FFFFFF;
+  --banana-hover: #F1C40F;
+  --banana-text: #2c3e50;
+  --banana-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --banana-radius: 20px;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,19 +17,21 @@
 
 html,
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f5f5f5;
+  color: var(--banana-text);
+  background-color: var(--banana-light);
 }
 
 a {
-  color: #0070f3;
+  color: var(--banana-dark);
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 a:hover {
-  text-decoration: underline;
+  color: var(--banana-yellow);
 }
 
 button {
@@ -35,83 +48,106 @@ textarea {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
 }
 
 /* 버튼 스타일 */
 .button {
-  padding: 12px 24px;
-  border: 1px solid #0070f3;
-  border-radius: 8px;
-  background-color: #0070f3;
-  color: white;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  /* Pill shape */
+  background-color: var(--banana-yellow);
+  color: var(--banana-dark);
   font-size: 16px;
-  transition: all 0.2s;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 5px;
+  box-shadow: 0 4px 15px rgba(244, 208, 63, 0.4);
 }
 
 .button:hover {
-  background-color: #0051cc;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
+  background-color: var(--banana-hover);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(244, 208, 63, 0.6);
 }
 
 .button:disabled {
-  background-color: #ccc;
-  border-color: #ccc;
+  background-color: #e0e0e0;
+  color: #a0a0a0;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 /* 카드 스타일 */
 .card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  background: var(--banana-white);
+  border-radius: var(--banana-radius);
+  padding: 30px;
+  box-shadow: var(--banana-shadow);
+  margin-bottom: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
 }
 
 /* 인풋 스타일 */
 .input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid #eee;
+  border-radius: 16px;
   font-size: 16px;
-  margin-bottom: 16px;
-  transition: border-color 0.2s;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+  background-color: #fcfcfc;
 }
 
 .input:focus {
   outline: none;
-  border-color: #0070f3;
+  border-color: var(--banana-yellow);
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(244, 208, 63, 0.1);
 }
 
 /* 테이블 */
 .table {
   width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--banana-white);
+  border-radius: var(--banana-radius);
   overflow: hidden;
+  box-shadow: var(--banana-shadow);
 }
 
 .table th,
 .table td {
-  padding: 12px;
+  padding: 16px 24px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .table th {
-  background-color: #f9f9f9;
-  font-weight: 600;
+  background-color: #fff;
+  font-weight: 700;
+  color: var(--banana-dark);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
 }
 
 /* 그리드 */
 .grid {
   display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
