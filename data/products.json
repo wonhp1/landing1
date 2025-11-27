@@ -1,81 +1,46 @@
 [
   {
-    "id": "product-1764163349035",
-    "name": "감자",
-    "description": "200g / 졸라맛있음 /",
-    "price": 2000,
+    "id": "product-1764204891301",
+    "name": "rr",
+    "description": "rr",
+    "price": 13,
     "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
-    "available": true,
-    "category": "기타",
-    "createdAt": "2025-11-26T13:22:29.035Z",
-    "updatedAt": "2025-11-26T13:26:51.498Z"
-  },
-  {
-    "id": "product-1764163479649",
-    "name": "토마토",
-    "description": "400g / 졸라 달음 /",
-    "price": 3000,
-    "imageUrl": "https://won-n.notion.site/image/attachment%3A14f10f1b-461b-44f8-83db-54397a81d4b0%3Aimage.png?table=block&id=2b7a5c09-bf09-80f1-a47b-ec0177afc889&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=840&userId=&cache=v2",
-    "available": true,
-    "category": "야채",
-    "createdAt": "2025-11-26T13:24:39.649Z",
-    "updatedAt": "2025-11-26T13:27:03.341Z"
-  },
-  {
-    "id": "product-1764178135920",
-    "name": "사과",
-    "description": "굿",
-    "price": 9000,
-    "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
-    "available": true,
     "category": "수산물",
-    "createdAt": "2025-11-26T17:28:55.920Z",
-    "updatedAt": "2025-11-26T17:32:22.675Z"
+    "weight": 3,
+    "available": true,
+    "displayOrder": 0
   },
   {
-    "id": "product-1764178144900",
-    "name": "멜론",
-    "description": "바보",
-    "price": 3000,
+    "id": "product_1764222352654_3",
+    "name": "악",
+    "description": "30",
+    "price": 333,
     "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
-    "available": true,
-    "category": "축산물",
-    "createdAt": "2025-11-26T17:29:04.900Z",
-    "updatedAt": "2025-11-26T17:36:42.825Z",
-    "weight": 3000
-  },
-  {
-    "id": "product-1764178151554",
-    "name": "아빠",
-    "description": "이런",
-    "price": 3000,
-    "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
-    "available": true,
-    "category": "수산물",
-    "createdAt": "2025-11-26T17:29:11.554Z",
-    "updatedAt": "2025-11-26T17:32:27.654Z"
-  },
-  {
-    "id": "product-1764178396556",
-    "name": "ㅇㅇㅇㅇㅇ",
-    "description": "ㅇㅇㅇ",
-    "price": 3333,
-    "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
-    "available": true,
-    "category": "수산물",
-    "weight": 300,
-    "createdAt": "2025-11-26T17:33:16.556Z",
-    "updatedAt": "2025-11-26T17:34:35.600Z"
-  },
-  {
-    "id": "product-1764178612895",
-    "name": "ㅁㄴㅇ",
-    "description": "ㅁㄴㅇㄹ",
-    "price": 3000,
-    "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
-    "available": true,
-    "category": "수산물",
+    "category": "과일",
     "weight": 30,
-    "createdAt": "2025-11-26T17:36:52.895Z"
+    "available": true,
+    "displayOrder": 1
+  },
+  {
+    "id": "product-1764204875811",
+    "name": "rr",
+    "description": "rr",
+    "price": 1,
+    "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
+    "category": "수산물",
+    "weight": 2,
+    "available": true,
+    "displayOrder": 2
+  },
+  {
+    "id": "product-1764204883122",
+    "name": "ww",
+    "description": "www",
+    "price": 2,
+    "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
+    "category": "수산물",
+    "weight": 2,
+    "available": true,
+    "displayOrder": 3
   }
 ]

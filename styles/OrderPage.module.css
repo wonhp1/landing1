@@ -1,0 +1,96 @@
+.selectedItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.productInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    /* Allow it to take space */
+    min-width: 0;
+    /* Prevent flex item from overflowing */
+    margin-right: 12px;
+}
+
+.weightInfo {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    /* Prevent controls from shrinking */
+}
+
+.quantityButton {
+    padding: 4px 12px;
+}
+
+.removeButton {
+    padding: 4px 12px;
+    margin-left: 12px;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+@media (max-width: 480px) {
+    .selectedItem {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 16px 0;
+    }
+
+    .productInfo {
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    .controls {
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+.categoryContainer {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.categoryButton {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: white;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    /* Prevent buttons from shrinking */
+}
+
+.categoryButton:hover {
+    background-color: #f5f5f5;
+}
+
+.categoryButtonActive {
+    background-color: #0070f3;
+    color: white;
+    border-color: #0070f3;
+}
+
+.categoryButtonActive:hover {
+    background-color: #0051cc;
+}

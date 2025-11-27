@@ -13,9 +13,11 @@ export default function Home() {
     const [products, setProducts] = useState([]);
     const [homepageSettings, setHomepageSettings] = useState(null);
     const [selectedProductId, setSelectedProductId] = useState('');
+    const [businessInfo, setBusinessInfo] = useState(null);
 
     useEffect(() => {
         fetchHomepageSettings();
+        fetchBusinessInfo();
     }, []);
 
     const fetchHomepageSettings = async () => {
@@ -42,6 +44,18 @@ export default function Home() {
             }
         } catch (error) {
             console.error('설정 로딩 실패:', error);
+        }
+    };
+
+    const fetchBusinessInfo = async () => {
+        try {
+            const res = await fetch('/api/business-info');
+            if (res.ok) {
+                const data = await res.json();
+                setBusinessInfo(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch business info:', error);
         }
     };
 
@@ -176,6 +190,18 @@ export default function Home() {
                     )}
                 </div>
             </div>
-        </div>
+
+            <footer style={{ marginTop: '50px', padding: '20px', borderTop: '1px solid #eee', color: '#666', fontSize: '12px', textAlign: 'center' }}>
+                {businessInfo && (
+                    <div style={{ lineHeight: '1.6' }}>
+                        <p style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '10px' }}>{businessInfo.businessName}</p>
+                        <p>대표: {businessInfo.representative} | 사업자등록번호: {businessInfo.businessLicense}</p>
+                        <p>주소: {businessInfo.address}</p>
+                        <p>전화: {businessInfo.phone} | 이메일: {businessInfo.email}</p>
+                        <p>통신판매업신고: {businessInfo.ecommerceLicense}</p>
+                    </div>
+                )}
+            </footer>
+        </div >
     );
 }

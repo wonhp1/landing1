@@ -54,6 +54,13 @@ export default function Admin() {
                     </div>
                 </Link>
 
+                <Link href="/admin/business-info">
+                    <div className="card" style={{ cursor: 'pointer', textAlign: 'center' }}>
+                        <h2>사업자 정보 관리</h2>
+                        <p style={{ color: '#666' }}>사업자 정보 수정</p>
+                    </div>
+                </Link>
+
                 <Link href="/admin/change-password">
                     <div className="card" style={{ cursor: 'pointer', textAlign: 'center' }}>
                         <h2>비밀번호 변경</h2>

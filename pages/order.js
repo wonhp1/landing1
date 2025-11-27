@@ -1,34 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import ProductCard from '../components/ProductCard';
+import Toast from '../components/Toast';
+import FloatingCartButton from '../components/FloatingCartButton';
+import styles from '../styles/OrderPage.module.css';
 
 export default function OrderPage() {
     const router = useRouter();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState(['전체']);
-    const [selectedCategory, setSelectedCategory] = useState('전체');
+    const [selectedCategories, setSelectedCategories] = useState(['전체']);
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const [businessInfo, setBusinessInfo] = useState(null);
     const [customerInfo, setCustomerInfo] = useState({
         name: '',
         phone: '',
-        postcode: '',
-        mainAddress: '',
-        detailAddress: ''
+        address: '',
+        detailAddress: '',
+        password: ''
     });
+    const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState('');
-    const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+    const [toast, setToast] = useState(null);
+    const [toastTimer, setToastTimer] = useState(null);
+    const cartRef = useRef(null);
+
+    const scrollToCart = () => {
+        cartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    const showToast = (msg) => {
+        if (toastTimer) clearTimeout(toastTimer);
+        setToast({ message: msg, visible: true });
+        const timer = setTimeout(() => {
+            setToast(prev => ({ ...prev, visible: false }));
+        }, 2000);
+        setToastTimer(timer);
+    };
 
     useEffect(() => {
         fetchProducts();
+        fetchBusinessInfo();
     }, []);
+
+    const fetchBusinessInfo = async () => {
+        try {
+            const res = await fetch('/api/business-info');
+            if (res.ok) {
+                const data = await res.json();
+                setBusinessInfo(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch business info:', error);
+        }
+    };
 
     const fetchProducts = async () => {
         try {
             const response = await fetch('/api/products');
             const data = await response.json();
             const availableProducts = data.filter(p => p.available);
+            // Sort by displayOrder
+            availableProducts.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
             setProducts(availableProducts);
 
             // 사용 가능한 카테고리 목록 생성
@@ -58,6 +93,7 @@ export default function OrderPage() {
                 weight: product.weight || 0
             }]);
         }
+        showToast(`${product.name}이(가) 추가되었습니다.`);
     };
 
     const handleQuantityChange = (productId, change) => {
@@ -196,9 +232,29 @@ export default function OrderPage() {
         }
     };
 
+    const handleCategoryClick = (category) => {
+        if (category === '전체') {
+            setSelectedCategories(['전체']);
+        } else {
+            let newCategories;
+            if (selectedCategories.includes('전체')) {
+                newCategories = [category];
+            } else if (selectedCategories.includes(category)) {
+                newCategories = selectedCategories.filter(c => c !== category);
+            } else {
+                newCategories = [...selectedCategories, category];
+            }
+
+            if (newCategories.length === 0) {
+                newCategories = ['전체'];
+            }
+            setSelectedCategories(newCategories);
+        }
+    };
+
     const filteredProducts = products.filter(product => {
-        if (selectedCategory === '전체') return true;
-        return (product.category || '기타') === selectedCategory;
+        if (selectedCategories.includes('전체')) return true;
+        return selectedCategories.includes(product.category || '기타');
     });
 
     return (
@@ -213,18 +269,17 @@ export default function OrderPage() {
             <h2 style={{ marginTop: '40px' }}>상품 선택</h2>
 
             {/* 상위 카테고리 선택 */}
-            <div style={{ marginBottom: '20px', maxWidth: '300px' }}>
-                <select
-                    className="input"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                    {categories.map(category => (
-                        <option key={category} value={category}>
-                            {category}
-                        </option>
-                    ))}
-                </select>
+            {/* 상위 카테고리 선택 */}
+            <div className={styles.categoryContainer}>
+                {categories.map(category => (
+                    <button
+                        key={category}
+                        className={`${styles.categoryButton} ${selectedCategories.includes(category) ? styles.categoryButtonActive : ''}`}
+                        onClick={() => handleCategoryClick(category)}
+                    >
+                        {category}
+                    </button>
+                ))}
             </div>
 
             <div className="grid">
@@ -238,37 +293,29 @@ export default function OrderPage() {
             </div>
 
             {selectedProducts.length > 0 && (
-                <div className="card" style={{ marginTop: '40px' }}>
+                <div className="card" style={{ marginTop: '40px' }} ref={cartRef}>
                     <h2>선택한 상품</h2>
                     {selectedProducts.map(product => (
-                        <div key={product.productId} style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: '10px 0',
-                            borderBottom: '1px solid #eee'
-                        }}>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div key={product.productId} className={styles.selectedItem}>
+                            <div className={styles.productInfo}>
                                 <span>{product.name}</span>
                                 {product.weight > 0 && (
-                                    <span style={{ fontSize: '12px', color: '#666' }}>
+                                    <span className={styles.weightInfo}>
                                         {product.weight}g x {product.quantity}개 = {(product.weight * product.quantity).toLocaleString()}g
                                     </span>
                                 )}
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div className={styles.controls}>
                                 <button
                                     onClick={() => handleQuantityChange(product.productId, -1)}
-                                    className="button"
-                                    style={{ padding: '4px 12px' }}
+                                    className={`button ${styles.quantityButton}`}
                                 >
                                     -
                                 </button>
                                 <span>{product.quantity}개</span>
                                 <button
                                     onClick={() => handleQuantityChange(product.productId, 1)}
-                                    className="button"
-                                    style={{ padding: '4px 12px' }}
+                                    className={`button ${styles.quantityButton}`}
                                 >
                                     +
                                 </button>
@@ -277,8 +324,7 @@ export default function OrderPage() {
                                 </span>
                                 <button
                                     onClick={() => handleRemoveProduct(product.productId)}
-                                    className="button"
-                                    style={{ padding: '4px 12px', marginLeft: '12px', backgroundColor: '#dc3545', borderColor: '#dc3545' }}
+                                    className={`button ${styles.removeButton}`}
                                 >
                                     제거
                                 </button>
@@ -394,6 +440,25 @@ export default function OrderPage() {
                     <div id="daum-postcode-frame" style={{ width: '100%', height: '100%' }} />
                 </div>
             </div>
+            <FloatingCartButton
+                onClick={scrollToCart}
+                itemCount={selectedProducts.reduce((sum, item) => sum + item.quantity, 0)}
+            />
+            {toast && (
+                <Toast message={toast.message} onClose={() => setToast(null)} />
+            )}
+
+            <footer style={{ marginTop: '50px', padding: '20px', borderTop: '1px solid #eee', color: '#666', fontSize: '12px', textAlign: 'center' }}>
+                {businessInfo && (
+                    <div style={{ lineHeight: '1.6' }}>
+                        <p style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '10px' }}>{businessInfo.businessName}</p>
+                        <p>대표: {businessInfo.representative} | 사업자등록번호: {businessInfo.businessLicense}</p>
+                        <p>주소: {businessInfo.address}</p>
+                        <p>전화: {businessInfo.phone} | 이메일: {businessInfo.email}</p>
+                        <p>통신판매업신고: {businessInfo.ecommerceLicense}</p>
+                    </div>
+                )}
+            </footer>
         </div>
     );
 }

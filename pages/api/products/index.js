@@ -1,41 +1,77 @@
-import { readData, writeData } from '../../../utils/storage';
+import fs from 'fs';
+import path from 'path';
+import { getAllProducts, updateAllProducts } from '../../../utils/googleSheets';
 import { requireAuth } from '../../../middleware/adminAuth';
 
 async function handler(req, res) {
-    const products = readData('products.json');
+    const filePath = path.join(process.cwd(), 'data', 'products.json');
 
     if (req.method === 'GET') {
-        // 모든 상품 조회 (공개)
-        return res.status(200).json(products);
-    }
-
-    if (req.method === 'POST') {
-        // 새 상품 생성 (관리자 전용)
-        const { name, description, price, imageUrl, available = true, category, weight } = req.body;
-
-        if (!name || !price) {
-            return res.status(400).json({ error: '상품명과 가격은 필수입니다.' });
+        try {
+            if (!fs.existsSync(filePath)) {
+                return res.status(200).json([]);
+            }
+            const fileData = fs.readFileSync(filePath, 'utf8');
+            const products = JSON.parse(fileData);
+            res.status(200).json(products);
+        } catch (error) {
+            console.error('상품 로딩 실패:', error);
+            res.status(500).json({ message: 'Failed to load products' });
         }
+    } else if (req.method === 'POST') {
+        const { action } = req.query;
 
-        const newProduct = {
-            id: `product-${Date.now()}`,
-            name,
-            description: description || '',
-            price: Number(price),
-            imageUrl: imageUrl || '',
-            available,
-            category: category && category.trim() ? category.trim() : '기타',
-            weight: weight ? Number(weight) : 0,
-            createdAt: new Date().toISOString()
-        };
+        // 구글 시트에 백업
+        if (action === 'backup-to-sheet') {
+            try {
+                const fileData = fs.readFileSync(filePath, 'utf8');
+                const products = JSON.parse(fileData);
 
-        products.push(newProduct);
-        writeData('products.json', products);
+                const success = await updateAllProducts(products);
+                if (success) {
+                    res.status(200).json({ message: '구글 시트에 백업 완료' });
+                } else {
+                    res.status(500).json({ message: '구글 시트 백업 실패' });
+                }
+            } catch (error) {
+                console.error('구글 시트 백업 실패:', error);
+                res.status(500).json({ message: '구글 시트 백업 실패' });
+            }
+        }
+        // 구글 시트에서 불러오기
+        else if (action === 'sync-from-sheet') {
+            try {
+                const sheetProducts = await getAllProducts();
+                fs.writeFileSync(filePath, JSON.stringify(sheetProducts, null, 2));
+                res.status(200).json({ message: '구글 시트에서 불러오기 완료', data: sheetProducts });
+            } catch (error) {
+                console.error('구글 시트 불러오기 실패:', error);
+                res.status(500).json({ message: '구글 시트에서 불러오기 실패' });
+            }
+        }
+        // 일반 상품 추가
+        else {
+            try {
+                const newProduct = req.body;
+                const products = fs.existsSync(filePath)
+                    ? JSON.parse(fs.readFileSync(filePath, 'utf8'))
+                    : [];
 
-        return res.status(201).json(newProduct);
+                newProduct.id = `product_${Date.now()}`;
+                newProduct.displayOrder = products.length + 1;
+                products.push(newProduct);
+
+                fs.writeFileSync(filePath, JSON.stringify(products, null, 2));
+                res.status(201).json(newProduct);
+            } catch (error) {
+                console.error('상품 추가 실패:', error);
+                res.status(500).json({ message: 'Failed to add product' });
+            }
+        }
+    } else {
+        res.setHeader('Allow', ['GET', 'POST']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-
-    return res.status(405).json({ error: 'Method not allowed' });
 }
 
 export default async function (req, res) {

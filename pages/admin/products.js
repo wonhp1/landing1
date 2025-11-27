@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Modal from '../../components/Modal';
@@ -23,6 +23,11 @@ export default function AdminProducts() {
     useEffect(() => {
         checkAuth();
         fetchProducts();
+
+        // Cleanup function to reset overflow when component unmounts
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
     }, []);
 
     const checkAuth = async () => {
@@ -113,18 +118,149 @@ export default function AdminProducts() {
         }
     };
 
+    const dragItem = useRef();
+    const dragOverItem = useRef();
+
+    const handleDragStart = (e, position) => {
+        dragItem.current = position;
+        e.target.style.opacity = '0.5';
+    };
+
+    const handleDragEnter = (e, position) => {
+        e.preventDefault();
+        dragOverItem.current = position;
+
+        const dragIndex = dragItem.current;
+        const dragOverIndex = dragOverItem.current;
+
+        if (dragIndex === undefined || dragOverIndex === undefined || dragIndex === dragOverIndex) return;
+
+        const newProducts = [...products];
+        const draggedItemContent = newProducts[dragIndex];
+
+        newProducts.splice(dragIndex, 1);
+        newProducts.splice(dragOverIndex, 0, draggedItemContent);
+
+        dragItem.current = dragOverIndex;
+        setProducts(newProducts);
+    };
+
+    const handleBackupToSheet = async () => {
+        if (!confirm('현재 상품 데이터를 구글 시트에 백업하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/products?action=backup-to-sheet', {
+                method: 'POST'
+            });
+
+            if (res.ok) {
+                alert('구글 시트에 백업 완료');
+            } else {
+                alert('백업 실패');
+            }
+        } catch (error) {
+            alert('오류 발생');
+        }
+    };
+
+    const handleSyncFromSheet = async () => {
+        if (!confirm('구글 시트의 데이터로 덮어쓰시겠습니까? 현재 데이터는 삭제됩니다.')) {
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/products?action=sync-from-sheet', {
+                method: 'POST'
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setProducts(data.data);
+                alert('구글 시트에서 불러오기 완료');
+            } else {
+                alert('불러오기 실패');
+            }
+        } catch (error) {
+            alert('오류 발생');
+        }
+    };
+
+    const handleDragEnd = async (e) => {
+        e.target.style.opacity = '1';
+        dragItem.current = null;
+        dragOverItem.current = null;
+        saveOrder();
+    };
+
+    const saveOrder = async () => {
+        // Update displayOrder
+        const updates = products.map((p, i) => ({
+            id: p.id,
+            displayOrder: i
+        }));
+
+        try {
+            await fetch('/api/products/reorder', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
+        } catch (error) {
+            console.error('Failed to save order:', error);
+            fetchProducts(); // Revert on error
+        }
+    };
+
+    // Mobile Touch Handlers
+    const handleTouchStart = (e, index) => {
+        dragItem.current = index;
+        e.currentTarget.style.opacity = '0.5';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling while dragging
+    };
+
+    const handleTouchMove = (e) => {
+        const touch = e.touches[0];
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        const row = element?.closest('tr');
+
+        if (!row) return;
+
+        const rowIndex = Array.from(row.parentNode.children).indexOf(row);
+
+        if (rowIndex !== -1 && rowIndex !== dragItem.current) {
+            const dragIndex = dragItem.current;
+            const dragOverIndex = rowIndex;
+
+            const newProducts = [...products];
+            const draggedItemContent = newProducts[dragIndex];
+
+            newProducts.splice(dragIndex, 1);
+            newProducts.splice(dragOverIndex, 0, draggedItemContent);
+
+            dragItem.current = dragOverIndex;
+            setProducts(newProducts);
+        }
+    };
+
+    const handleTouchEnd = (e) => {
+        e.currentTarget.style.opacity = '1';
+        document.body.style.overflow = 'auto'; // Restore scrolling
+        dragItem.current = null;
+        saveOrder();
+    };
+
     return (
         <div className="container">
             <h1>상품 관리</h1>
 
-            <div style={{ marginTop: '20px' }}>
-                <button className="button" onClick={() => handleOpenModal()}>
-                    새 상품 추가
-                </button>
+            <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button onClick={() => handleOpenModal()} className="button">상품 추가</button>
+                <button onClick={handleBackupToSheet} className="button" style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}>시트 백업</button>
+                <button onClick={handleSyncFromSheet} className="button" style={{ backgroundColor: '#ffc107', borderColor: '#ffc107' }}>시트 불러오기</button>
                 <Link href="/admin">
-                    <button className="button" style={{ backgroundColor: '#666', borderColor: '#666' }}>
-                        관리자 페이지로
-                    </button>
+                    <button className="button" style={{ backgroundColor: '#666', borderColor: '#666' }}>관리자 홈</button>
                 </Link>
             </div>
 
@@ -135,6 +271,7 @@ export default function AdminProducts() {
                     <table className="table">
                         <thead>
                             <tr>
+                                <th>순서</th>
                                 <th>이미지</th>
                                 <th>상품명</th>
                                 <th>구분</th>
@@ -145,8 +282,28 @@ export default function AdminProducts() {
                             </tr>
                         </thead>
                         <tbody>
-                            {products.map(product => (
-                                <tr key={product.id}>
+                            {products.map((product, index) => (
+                                <tr
+                                    key={product.id}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, index)}
+                                    onDragEnter={(e) => handleDragEnter(e, index)}
+                                    onDragEnd={handleDragEnd}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onTouchStart={(e) => handleTouchStart(e, index)}
+                                    onTouchMove={handleTouchMove}
+                                    onTouchEnd={handleTouchEnd}
+                                    onTouchCancel={handleTouchEnd}
+                                    style={{
+                                        cursor: 'move',
+                                        userSelect: 'none',
+                                        backgroundColor: 'white',
+                                        touchAction: 'none' // Important for touch events
+                                    }}
+                                >
+                                    <td style={{ textAlign: 'center', color: '#999', fontSize: '20px' }}>
+                                        ☰
+                                    </td>
                                     <td>
                                         {product.imageUrl && (
                                             <img src={product.imageUrl} alt={product.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
