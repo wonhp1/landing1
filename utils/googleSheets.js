@@ -177,3 +177,39 @@ export async function updateAllProducts(products) {
         return false;
     }
 }
+
+// 주문 내역을 구글 시트의 "order" 시트에 추가
+export async function appendOrder(orderData) {
+    try {
+        const { timestamp, products, customerName, customerPhone, address, request, totalAmount } = orderData;
+
+        // 주문상품을 문자열로 변환 (예: "사과 x 2, 배 x 1")
+        const productStr = products.map(p => `${p.name} x ${p.quantity}`).join(', ');
+
+        // 시간, 주문상품, 이름, 전화번호, 주소, 요청사항, 매출
+        const row = [
+            timestamp || new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+            productStr,
+            customerName,
+            customerPhone,
+            address,
+            request || '',
+            totalAmount || 0
+        ];
+
+        await sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'order!A:G', // A부터 G열까지 (매출 컬럼 추가)
+            valueInputOption: 'RAW',
+            insertDataOption: 'INSERT_ROWS',
+            requestBody: {
+                values: [row]
+            }
+        });
+
+        return true;
+    } catch (error) {
+        console.error('구글 시트에 주문 추가 중 오류 발생:', error);
+        return false;
+    }
+}

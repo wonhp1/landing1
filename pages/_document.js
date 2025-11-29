@@ -3,7 +3,9 @@ import { Html, Head, Main, NextScript } from 'next/document';
 export default function Document() {
     return (
         <Html lang="ko">
-            <Head />
+            <Head>
+                <script src="https://js.tosspayments.com/v2/standard"></script>
+            </Head>
             <body>
                 <Main />
                 <NextScript />

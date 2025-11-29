@@ -4,6 +4,7 @@ import Script from 'next/script';
 import ProductCard from '../components/ProductCard';
 import Toast from '../components/Toast';
 import FloatingCartButton from '../components/FloatingCartButton';
+import PaymentModal from '../components/PaymentModal';
 import styles from '../styles/OrderPage.module.css';
 
 export default function OrderPage() {
@@ -18,13 +19,15 @@ export default function OrderPage() {
         phone: '',
         address: '',
         detailAddress: '',
-        password: ''
+        password: '',
+        request: ''  // 요청사항 (비필수)
     });
     const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState('');
     const [toast, setToast] = useState(null);
     const [toastTimer, setToastTimer] = useState(null);
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const cartRef = useRef(null);
 
     const scrollToCart = () => {
@@ -177,6 +180,26 @@ export default function OrderPage() {
         return selectedProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
     };
 
+    // 전화번호 자동 포맷팅 함수
+    const formatPhoneNumber = (value) => {
+        // 숫자만 추출
+        const numbers = value.replace(/[^0-9]/g, '');
+
+        // 010-0000-0000 형식으로 포맷팅
+        if (numbers.length <= 3) {
+            return numbers;
+        } else if (numbers.length <= 7) {
+            return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+        } else {
+            return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+        }
+    };
+
+    const handlePhoneChange = (e) => {
+        const formatted = formatPhoneNumber(e.target.value);
+        setCustomerInfo({ ...customerInfo, phone: formatted });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -185,51 +208,36 @@ export default function OrderPage() {
             return;
         }
 
-        if (!customerInfo.name || !customerInfo.phone) {
-            setMessage('이름과 전화번호를 입력해주세요.');
+        if (!customerInfo.name) {
+            setMessage('이름을 입력해주세요.');
             return;
         }
 
-        setIsSubmitting(true);
-        setMessage('');
-
-        try {
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: customerInfo.name,
-                    phone: customerInfo.phone,
-                    address: `${customerInfo.postcode ? `(${customerInfo.postcode}) ` : ''}${customerInfo.mainAddress} ${customerInfo.detailAddress}`.trim(),
-                    products: selectedProducts.map(p => ({ productId: p.productId, quantity: p.quantity }))
-                }),
-            });
-
-            if (response.ok) {
-                setMessage('주문이 완료되었습니다!');
-                setSelectedProducts([]);
-                setCustomerInfo({
-                    name: '',
-                    phone: '',
-                    postcode: '',
-                    mainAddress: '',
-                    detailAddress: ''
-                });
-
-                setTimeout(() => {
-                    router.push('/');
-                }, 2000);
-            } else {
-                setMessage('주문 중 오류가 발생했습니다.');
-            }
-        } catch (error) {
-            console.error('주문 실패:', error);
-            setMessage('주문 중 오류가 발생했습니다.');
-        } finally {
-            setIsSubmitting(false);
+        if (!customerInfo.phone) {
+            setMessage('전화번호를 입력해주세요.');
+            return;
         }
+
+        // 전화번호 형식 검증 (010-0000-0000)
+        const phoneRegex = /^010-\d{4}-\d{4}$/;
+        if (!phoneRegex.test(customerInfo.phone)) {
+            setMessage('전화번호는 010-0000-0000 형식으로 입력해주세요.');
+            return;
+        }
+
+        if (!customerInfo.mainAddress) {
+            setMessage('주소를 입력해주세요. "주소 찾기" 버튼을 클릭하세요.');
+            return;
+        }
+
+        if (!customerInfo.detailAddress || customerInfo.detailAddress.trim() === '') {
+            setMessage('상세 주소를 입력해주세요.');
+            return;
+        }
+
+        // Open Payment Modal
+        setMessage('');
+        setIsPaymentModalOpen(true);
     };
 
     const handleCategoryClick = (category) => {
@@ -349,15 +357,16 @@ export default function OrderPage() {
                 />
                 <input
                     type="tel"
-                    placeholder="전화번호 *"
+                    placeholder="전화번호 * (010-0000-0000)"
                     className="input"
                     value={customerInfo.phone}
-                    onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
+                    onChange={handlePhoneChange}
+                    maxLength="13"
                     required
                 />
                 {/* 주소: 다음 우편번호 API + 기본주소 + 상세주소 */}
                 <div style={{ marginTop: '10px', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>주소</span>
+                    <span>주소 *</span>
                     <button
                         type="button"
                         className="button"
@@ -385,10 +394,20 @@ export default function OrderPage() {
                 />
                 <input
                     type="text"
-                    placeholder="상세 주소 (건물명, 호수 등)"
+                    placeholder="상세 주소 * (건물명, 호수 등)"
                     className="input"
                     value={customerInfo.detailAddress}
                     onChange={(e) => setCustomerInfo({ ...customerInfo, detailAddress: e.target.value })}
+                    required
+                />
+
+                <textarea
+                    placeholder="요청사항 (선택사항)"
+                    className="input"
+                    value={customerInfo.request}
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, request: e.target.value })}
+                    rows="3"
+                    style={{ resize: 'vertical', fontFamily: 'inherit' }}
                 />
                 <button type="submit" className="button" disabled={isSubmitting}>
                     {isSubmitting ? '주문 중...' : '주문하기'}
@@ -459,6 +478,19 @@ export default function OrderPage() {
                     </div>
                 )}
             </footer>
+
+            <PaymentModal
+                isOpen={isPaymentModalOpen}
+                onClose={() => setIsPaymentModalOpen(false)}
+                amount={getTotalAmount()}
+                orderId={'ORDER_' + new Date().getTime()}
+                orderName={selectedProducts.length > 1 ? `${selectedProducts[0].name} 외 ${selectedProducts.length - 1}건` : selectedProducts[0]?.name}
+                customerName={customerInfo.name}
+                customerEmail="" // Optional
+                customerMobilePhone={customerInfo.phone.replace(/[^0-9]/g, '')} // 하이픈 제거하고 숫자만 전달
+                products={selectedProducts}
+                customerInfo={customerInfo}
+            />
         </div>
     );
 }
