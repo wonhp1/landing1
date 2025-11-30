@@ -128,3 +128,16 @@
     border-color: var(--banana-hover);
     transform: translateY(-2px);
 }
+
+.instructionText {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    border-radius: 8px;
+    display: inline-block;
+    backdrop-filter: blur(4px);
+    width: 100%;
+}

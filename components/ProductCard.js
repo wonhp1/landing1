@@ -11,9 +11,12 @@ export default function ProductCard({ product, onSelect }) {
             )}
             <div className={styles.content}>
                 <div className={styles.header}>
-                    {product.category && (
-                        <span className={styles.categoryBadge}>{product.category}</span>
-                    )}
+                    <div className={styles.categoryRow}>
+                        {product.category && (
+                            <span className={styles.categoryBadge}>{product.category}</span>
+                        )}
+                        <span className={styles.detailHint}>상세보기 🔍</span>
+                    </div>
                     <h3 className={styles.name}>{product.name}</h3>
                 </div>
                 <p className={styles.description}>{product.description}</p>
