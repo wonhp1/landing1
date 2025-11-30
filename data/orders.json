@@ -119,7 +119,27 @@
       }
     ],
     "totalAmount": 18000,
+    "status": "confirmed",
+    "createdAt": "2025-11-29T18:52:53.602Z",
+    "updatedAt": "2025-11-30T11:24:16.989Z"
+  },
+  {
+    "id": "order-1764502200279",
+    "customerName": "김경원",
+    "customerPhone": "010-5620-9852",
+    "customerEmail": "",
+    "address": "(08738) 서울 관악구 관악로 186 (봉천동) ㄴ",
+    "request": "",
+    "products": [
+      {
+        "productId": "product-1764204883122",
+        "quantity": 1,
+        "name": "바나나",
+        "price": 3000
+      }
+    ],
+    "totalAmount": 3000,
     "status": "pending",
-    "createdAt": "2025-11-29T18:52:53.602Z"
+    "createdAt": "2025-11-30T11:30:00.279Z"
   }
 ]

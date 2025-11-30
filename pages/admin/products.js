@@ -17,7 +17,8 @@ export default function AdminProducts() {
         imageUrl: '',
         available: true,
         category: CATEGORY_OPTIONS[0],
-        weight: ''
+        weight: '',
+        detailPageUrl: ''
     });
 
     useEffect(() => {
@@ -61,7 +62,8 @@ export default function AdminProducts() {
                 imageUrl: product.imageUrl,
                 available: product.available,
                 category: product.category || '기타',
-                weight: product.weight || ''
+                weight: product.weight || '',
+                detailPageUrl: product.detailPageUrl || ''
             });
         } else {
             setEditingProduct(null);
@@ -72,7 +74,8 @@ export default function AdminProducts() {
                 imageUrl: '',
                 available: true,
                 category: CATEGORY_OPTIONS[0],
-                weight: ''
+                weight: '',
+                detailPageUrl: ''
             });
         }
         setIsModalOpen(true);
@@ -375,6 +378,14 @@ export default function AdminProducts() {
                         className="input"
                         value={formData.imageUrl}
                         onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                    />
+                    <textarea
+                        placeholder="상세 이미지 URL (쉼표로 구분)&#10;예: https://image1.jpg, https://image2.jpg"
+                        className="input"
+                        value={formData.detailPageUrl}
+                        onChange={(e) => setFormData({ ...formData, detailPageUrl: e.target.value })}
+                        rows="3"
+                        style={{ resize: 'vertical', fontFamily: 'inherit' }}
                     />
                     <select
                         className="input"

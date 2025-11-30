@@ -5,6 +5,7 @@ import ProductCard from '../components/ProductCard';
 import Toast from '../components/Toast';
 import FloatingCartButton from '../components/FloatingCartButton';
 import PaymentModal from '../components/PaymentModal';
+import ProductDetailModal from '../components/ProductDetailModal';
 import styles from '../styles/OrderPage.module.css';
 
 export default function OrderPage() {
@@ -28,6 +29,8 @@ export default function OrderPage() {
     const [toast, setToast] = useState(null);
     const [toastTimer, setToastTimer] = useState(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedDetailProduct, setSelectedDetailProduct] = useState(null);
     const cartRef = useRef(null);
 
     const scrollToCart = () => {
@@ -97,6 +100,11 @@ export default function OrderPage() {
             }]);
         }
         showToast(`${product.name}이(가) 추가되었습니다.`);
+    };
+
+    const handleCardClick = (product) => {
+        setSelectedDetailProduct(product);
+        setIsDetailModalOpen(true);
     };
 
     const handleQuantityChange = (productId, change) => {
@@ -292,11 +300,17 @@ export default function OrderPage() {
 
             <div className="grid">
                 {filteredProducts.map(product => (
-                    <ProductCard
-                        key={product.id}
-                        product={product}
-                        onSelect={handleSelectProduct}
-                    />
+                    <div key={product.id} onClick={() => handleCardClick(product)} style={{ cursor: 'pointer' }}>
+                        <ProductCard
+                            product={product}
+                            onSelect={(e) => {
+                                if (e && e.stopPropagation) {
+                                    e.stopPropagation();
+                                }
+                                handleSelectProduct(product);
+                            }}
+                        />
+                    </div>
                 ))}
             </div>
 
@@ -464,7 +478,7 @@ export default function OrderPage() {
                 itemCount={selectedProducts.reduce((sum, item) => sum + item.quantity, 0)}
             />
             {toast && (
-                <Toast message={toast.message} onClose={() => setToast(null)} />
+                <Toast message={toast.message} isVisible={toast.visible} />
             )}
 
             <footer style={{ marginTop: '50px', padding: '20px', borderTop: '1px solid #eee', color: '#666', fontSize: '12px', textAlign: 'center' }}>
@@ -490,6 +504,13 @@ export default function OrderPage() {
                 customerMobilePhone={customerInfo.phone.replace(/[^0-9]/g, '')} // 하이픈 제거하고 숫자만 전달
                 products={selectedProducts}
                 customerInfo={customerInfo}
+            />
+
+            <ProductDetailModal
+                isOpen={isDetailModalOpen}
+                onClose={() => setIsDetailModalOpen(false)}
+                product={selectedDetailProduct}
+                onAddToCart={handleSelectProduct}
             />
         </div>
     );

@@ -1,31 +1,70 @@
 .toast {
     position: fixed;
-    top: 20px;
+    top: 80px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
+    background: linear-gradient(135deg, #34C759 0%, #28a745 100%);
     color: white;
-    padding: 12px 24px;
+    padding: 16px 28px;
     border-radius: 50px;
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 2000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: slideDown 0.3s ease-out forwards;
-    backdrop-filter: blur(4px);
+    font-size: 16px;
+    font-weight: 600;
+    z-index: 10000;
+    box-shadow: 0 8px 24px rgba(52, 199, 89, 0.4);
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    backdrop-filter: blur(10px);
     white-space: nowrap;
     pointer-events: none;
-    /* Allow clicking through */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.message {
+    font-size: 16px;
 }
 
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translate(-50%, -20px);
+        transform: translate(-50%, -30px) scale(0.9);
     }
 
     to {
         opacity: 1;
-        transform: translate(-50%, 0);
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .toast {
+        top: 60px;
+        padding: 14px 24px;
+        font-size: 14px;
+        max-width: 90%;
+    }
+
+    .icon {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+    }
+
+    .message {
+        font-size: 14px;
     }
 }

@@ -31,10 +31,10 @@ export default function ProductCard({ product, onSelect }) {
                     {onSelect && (
                         <button
                             className={styles.button}
-                            onClick={() => onSelect(product)}
+                            onClick={(e) => onSelect(e)}
                             disabled={!product.available}
                         >
-                            {product.available ? '선택' : '품절'}
+                            {product.available ? '장바구니 담기' : '품절'}
                         </button>
                     )}
                 </div>

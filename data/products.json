@@ -2,45 +2,49 @@
   {
     "id": "product-1764204891301",
     "name": "사과",
-    "description": "졸라달음 / 개맛있음",
+    "description": "졸라달음 / 개맛있음 / test",
     "price": 5000,
     "imageUrl": "https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2",
     "category": "과일",
     "weight": 1000,
     "available": true,
-    "displayOrder": 1
+    "displayOrder": 1,
+    "detailPageUrl": "https://won-n.notion.site/image/attachment%3Ab884183f-aad4-4aec-8865-640b46efe806%3Aimage.png?table=block&id=2bba5c09-bf09-8081-bfdf-edebe24b1354&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=1320&userId=&cache=v2, https://won-n.notion.site/image/attachment%3A1e460a4b-f282-4960-a8ff-b43f32b99b41%3Aimage.png?table=block&id=2b7a5c09-bf09-80bf-ab8c-ebd8c0e04c84&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=930&userId=&cache=v2"
   },
   {
     "id": "product_1764222352654_3",
     "name": "딱감",
-    "description": "졸라 딱딱함 / 개달음",
+    "description": "졸라 딱딱함 / 개달음 / test",
     "price": 6000,
     "imageUrl": "https://won-n.notion.site/image/attachment%3A8e8d979c-4e5c-42f5-bbef-28f95c2d937d%3Aimage.png?table=block&id=2b8a5c09-bf09-80ef-bb40-e6c71fd814b2&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=880&userId=&cache=v2",
     "category": "과일",
     "weight": 1000,
     "available": true,
-    "displayOrder": 2
+    "displayOrder": 2,
+    "detailPageUrl": ""
   },
   {
     "id": "product-1764204875811",
     "name": "딸기",
-    "description": "개말랑함 / 과즙많음",
+    "description": "개말랑함 / 과즙많음 / test",
     "price": 7000,
     "imageUrl": "https://won-n.notion.site/image/attachment%3A14f10f1b-461b-44f8-83db-54397a81d4b0%3Aimage.png?table=block&id=2b7a5c09-bf09-80f1-a47b-ec0177afc889&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=840&userId=&cache=v2",
     "category": "과일",
     "weight": 600,
     "available": true,
-    "displayOrder": 3
+    "displayOrder": 3,
+    "detailPageUrl": ""
   },
   {
     "id": "product-1764204883122",
     "name": "바나나",
-    "description": "갈변개빠름",
+    "description": "갈변개빠름 / test",
     "price": 3000,
     "imageUrl": "https://won-n.notion.site/image/attachment%3A7df9e240-953c-4813-b051-22d1e77f9b18%3Aimage.png?table=block&id=2b8a5c09-bf09-8041-bffa-e5ca11fe88fd&spaceId=c67cb41f-434e-462d-b32b-1342a605f5e9&width=780&userId=&cache=v2",
     "category": "과일",
     "weight": 1000,
     "available": true,
-    "displayOrder": 4
+    "displayOrder": 4,
+    "detailPageUrl": ""
   }
 ]

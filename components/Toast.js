@@ -5,7 +5,8 @@ export default function Toast({ message, isVisible }) {
 
     return (
         <div className={styles.toast}>
-            {message}
+            <span className={styles.icon}>✓</span>
+            <span className={styles.message}>{message}</span>
         </div>
     );
 }

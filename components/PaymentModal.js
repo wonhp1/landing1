@@ -127,9 +127,17 @@ export default function PaymentModal({ isOpen, onClose, amount, orderId, orderNa
                 <button className={styles.closeButton} onClick={onClose}>×</button>
                 <h2 className={styles.title}>결제하기</h2>
 
+                {/* Loading Indicator */}
+                {!paymentWidget && (
+                    <div className={styles.loadingOverlay}>
+                        <div className={styles.spinner}></div>
+                        <p className={styles.loadingText}>결제 모듈을 불러오는 중입니다...</p>
+                    </div>
+                )}
+
                 {/* Payment Widget Container */}
-                <div id="payment-method" />
-                <div id="agreement" />
+                <div id="payment-method" style={{ opacity: paymentWidget ? 1 : 0 }} />
+                <div id="agreement" style={{ opacity: paymentWidget ? 1 : 0 }} />
 
                 <button
                     className={styles.payButton}
