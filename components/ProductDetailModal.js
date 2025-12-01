@@ -1,8 +1,24 @@
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import styles from '../styles/ProductDetailModal.module.css';
+
+// Dynamic import to avoid SSR issues with react-notion-x
+const NotionRenderer = dynamic(() => import('./NotionRenderer'), {
+    ssr: false,
+    loading: () => (
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+            <div className="spinner"></div>
+            <p>Notion 콘텐츠를 불러오는 중...</p>
+        </div>
+    )
+});
+
 
 export default function ProductDetailModal({ isOpen, onClose, product, onAddToCart }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [notionData, setNotionData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     // Parse detail images from detailPageUrl (comma-separated)
     const detailImages = product?.detailPageUrl
@@ -20,7 +36,7 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
             // Save current scroll position
             const scrollY = window.scrollY;
             document.body.style.position = 'fixed';
-            document.body.style.top = `-${scrollY}px`;
+            document.body.style.top = `- ${scrollY} px`;
             document.body.style.width = '100%';
             document.body.style.overflow = 'hidden';
         } else {
@@ -35,6 +51,85 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
             }
         }
     }, [isOpen]);
+
+    // Detect if detailPageUrl is a Notion page ID/URL or image URLs
+    const isNotionPage = product?.detailPageUrl && (() => {
+        const url = product.detailPageUrl.trim();
+
+        // If it contains comma, it's multiple image URLs
+        if (url.includes(',')) return false;
+
+        // If it's a regular image URL (http/https ending with image extension)
+        if (/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(url)) return false;
+
+        // If it's a Notion URL (notion.so or notion.site) or looks like a page ID
+        if (url.includes('notion.so') || url.includes('notion.site') ||
+            /^[a-f0-9]{32}$/i.test(url.replace(/-/g, ''))) {
+            return true;
+        }
+
+        return false;
+    })();
+
+    // Extract clean page ID from various Notion URL formats
+    const getNotionPageId = (urlOrId) => {
+        if (!urlOrId) return null;
+
+        // Extract ID from notion.so or notion.site URLs
+        const match = urlOrId.match(/([a-f0-9]{32}|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i);
+        if (match) {
+            return match[1].replace(/-/g, '');
+        }
+
+        // If it's already a clean ID
+        if (/^[a-f0-9]{32}$/i.test(urlOrId.replace(/-/g, ''))) {
+            return urlOrId.replace(/-/g, '');
+        }
+
+        return null;
+    };
+
+
+    // Fetch Notion content when modal opens (if it's a Notion page)
+    useEffect(() => {
+        if (isOpen && isNotionPage && product?.detailPageUrl) {
+            fetchNotionContent();
+        } else {
+            // Reset Notion data when switching to image gallery or closing
+            setNotionData(null);
+            setLoading(false);
+            setError(null);
+        }
+    }, [isOpen, product?.detailPageUrl]);
+
+    const fetchNotionContent = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            // Extract clean page ID from URL
+            const pageId = getNotionPageId(product.detailPageUrl);
+
+            if (!pageId) {
+                throw new Error('유효하지 않은 Notion 페이지 URL입니다');
+            }
+
+            const res = await fetch(`/api/notion/${encodeURIComponent(pageId)}`);
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Failed to fetch Notion page');
+            }
+
+            const data = await res.json();
+            setNotionData(data);
+        } catch (err) {
+            console.error('Error fetching Notion content:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (!isOpen || !product) return null;
 
@@ -83,41 +178,73 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
                     </div>
                 </div>
 
-                {/* Detail Image Gallery */}
-                {detailImages.length > 0 && (
+                {/* Detail Content Section - Notion or Image Gallery */}
+                {product.detailPageUrl && (
                     <div className={styles.detailSection}>
                         <h3 className={styles.sectionTitle}>상품 상세 정보</h3>
-                        <div className={styles.imageGallery}>
-                            <div className={styles.imageContainer}>
-                                <img
-                                    src={detailImages[currentImageIndex]}
-                                    alt={`상세 이미지 ${currentImageIndex + 1}`}
-                                    className={styles.detailImage}
-                                />
 
-                                {detailImages.length > 1 && (
-                                    <>
-                                        <button
-                                            className={`${styles.navButton} ${styles.navButtonPrev}`}
-                                            onClick={handlePrevImage}
-                                            aria-label="이전 이미지"
-                                        >
-                                            ‹
-                                        </button>
-                                        <button
-                                            className={`${styles.navButton} ${styles.navButtonNext}`}
-                                            onClick={handleNextImage}
-                                            aria-label="다음 이미지"
-                                        >
-                                            ›
-                                        </button>
-                                        <div className={styles.imageCounter}>
-                                            {currentImageIndex + 1} / {detailImages.length}
-                                        </div>
-                                    </>
+                        {/* Notion Content */}
+                        {isNotionPage && (
+                            <>
+                                {loading && (
+                                    <div className={styles.loadingContainer}>
+                                        <div className={styles.spinner}></div>
+                                        <p>상세 정보를 불러오는 중...</p>
+                                    </div>
                                 )}
+
+                                {error && (
+                                    <div className={styles.errorContainer}>
+                                        <p>❌ 상세 정보를 불러올 수 없습니다.</p>
+                                        <small>{error}</small>
+                                    </div>
+                                )}
+
+                                {notionData && !loading && !error && (
+                                    <div className={styles.notionContent}>
+                                        <NotionRenderer
+                                            blocks={notionData.blocks}
+                                            page={notionData.page}
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {/* Image Gallery (backward compatibility) */}
+                        {!isNotionPage && detailImages.length > 0 && (
+                            <div className={styles.imageGallery}>
+                                <div className={styles.imageContainer}>
+                                    <img
+                                        src={detailImages[currentImageIndex]}
+                                        alt={`상세 이미지 ${currentImageIndex + 1} `}
+                                        className={styles.detailImage}
+                                    />
+
+                                    {detailImages.length > 1 && (
+                                        <>
+                                            <button
+                                                className={`${styles.navButton} ${styles.navButtonPrev} `}
+                                                onClick={handlePrevImage}
+                                                aria-label="이전 이미지"
+                                            >
+                                                ‹
+                                            </button>
+                                            <button
+                                                className={`${styles.navButton} ${styles.navButtonNext} `}
+                                                onClick={handleNextImage}
+                                                aria-label="다음 이미지"
+                                            >
+                                                ›
+                                            </button>
+                                            <div className={styles.imageCounter}>
+                                                {currentImageIndex + 1} / {detailImages.length}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 )}
 

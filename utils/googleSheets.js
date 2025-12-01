@@ -112,7 +112,7 @@ export async function getAllProducts() {
     try {
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'products!A2:J'
+            range: 'products!A2:I'
         });
 
         const rows = response.data.values;
@@ -125,12 +125,11 @@ export async function getAllProducts() {
             name: row[1] || '',
             description: row[2] || '',
             price: parseInt(row[3]) || 0,
-            imageUrl: row[4] || '',
-            category: row[5] || '기타',
-            weight: parseInt(row[6]) || 0,
-            available: row[7] === 'TRUE' || row[7] === true,
+            category: row[4] || '기타',
+            weight: parseInt(row[5]) || 0,
+            available: row[6] === 'TRUE' || row[6] === true,
             displayOrder: index + 1,
-            detailPageUrl: row[9] || ''
+            detailPageUrl: row[8] || ''
         }));
     } catch (error) {
         console.error('구글 시트에서 상품을 가져오는 중 오류 발생:', error);
@@ -150,7 +149,6 @@ export async function updateAllProducts(products) {
             product.name,
             product.description || '',
             product.price,
-            product.imageUrl || '',
             product.category || '기타',
             product.weight || 0,
             product.available ? 'TRUE' : 'FALSE',
@@ -161,13 +159,13 @@ export async function updateAllProducts(products) {
         // 기존 데이터 삭제 후 새로 쓰기
         await sheets.spreadsheets.values.clear({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'products!A2:J'
+            range: 'products!A2:I'
         });
 
         if (values.length > 0) {
             await sheets.spreadsheets.values.update({
                 spreadsheetId: SPREADSHEET_ID,
-                range: 'products!A2:J',
+                range: 'products!A2:I',
                 valueInputOption: 'RAW',
                 requestBody: { values }
             });

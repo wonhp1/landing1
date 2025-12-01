@@ -14,7 +14,6 @@ export default function AdminProducts() {
         name: '',
         description: '',
         price: '',
-        imageUrl: '',
         available: true,
         category: CATEGORY_OPTIONS[0],
         weight: '',
@@ -59,7 +58,6 @@ export default function AdminProducts() {
                 name: product.name,
                 description: product.description,
                 price: product.price,
-                imageUrl: product.imageUrl,
                 available: product.available,
                 category: product.category || '기타',
                 weight: product.weight || '',
@@ -71,7 +69,6 @@ export default function AdminProducts() {
                 name: '',
                 description: '',
                 price: '',
-                imageUrl: '',
                 available: true,
                 category: CATEGORY_OPTIONS[0],
                 weight: '',
@@ -275,7 +272,6 @@ export default function AdminProducts() {
                         <thead>
                             <tr>
                                 <th>순서</th>
-                                <th>이미지</th>
                                 <th>상품명</th>
                                 <th>구분</th>
                                 <th>가격</th>
@@ -306,11 +302,6 @@ export default function AdminProducts() {
                                 >
                                     <td style={{ textAlign: 'center', color: '#999', fontSize: '20px' }}>
                                         ☰
-                                    </td>
-                                    <td>
-                                        {product.imageUrl && (
-                                            <img src={product.imageUrl} alt={product.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                        )}
                                     </td>
                                     <td>{product.name}</td>
                                     <td>{product.category || '기타'}</td>
@@ -372,20 +363,13 @@ export default function AdminProducts() {
                         value={formData.weight}
                         onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                     />
-                    <input
-                        type="url"
-                        placeholder="이미지 URL"
-                        className="input"
-                        value={formData.imageUrl}
-                        onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    />
                     <textarea
-                        placeholder="상세 이미지 URL (쉼표로 구분)&#10;예: https://image1.jpg, https://image2.jpg"
+                        placeholder="Notion 페이지 URL (https://notion.so/...) 또는 이미지 URL (쉼표로 구분)&#10;예: https://notion.so/Product-abc123... 또는 https://image1.jpg, https://image2.jpg"
                         className="input"
                         value={formData.detailPageUrl}
                         onChange={(e) => setFormData({ ...formData, detailPageUrl: e.target.value })}
                         rows="3"
-                        style={{ resize: 'vertical', fontFamily: 'inherit' }}
+                        style={{ resize: 'vertical', fontFamily: 'monospace', fontSize: '13px' }}
                     />
                     <select
                         className="input"
