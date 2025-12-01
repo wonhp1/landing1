@@ -63,13 +63,14 @@ export async function updateBusinessInfo(info) {
                 info.address || '',
                 info.phone || '',
                 info.email || '',
-                info.ecommerceLicense || ''
+                info.ecommerceLicense || '',
+                info.kakaoUrl || ''
             ]
         ];
 
         await sheets.spreadsheets.values.update({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'business_info!A2:G2',
+            range: 'business_info!A2:H2',
             valueInputOption: 'RAW',
             requestBody: { values }
         });
@@ -85,7 +86,7 @@ export async function getBusinessInfo() {
     try {
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'business_info!A2:G2'
+            range: 'business_info!A2:H2'
         });
 
         const values = response.data.values?.[0];
@@ -100,7 +101,8 @@ export async function getBusinessInfo() {
             address: values[3] || '',
             phone: values[4] || '',
             email: values[5] || '',
-            ecommerceLicense: values[6] || ''
+            ecommerceLicense: values[6] || '',
+            kakaoUrl: values[7] || ''
         };
     } catch (error) {
         console.error('구글 시트에서 사업자 정보를 가져오는 중 오류 발생:', error);

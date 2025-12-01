@@ -11,7 +11,8 @@ export default function BusinessInfo() {
         address: '',
         phone: '',
         email: '',
-        ecommerceLicense: ''
+        ecommerceLicense: '',
+        kakaoUrl: ''
     });
     const [message, setMessage] = useState('');
 
@@ -168,6 +169,17 @@ export default function BusinessInfo() {
                         value={info.ecommerceLicense}
                         onChange={handleChange}
                         className="input"
+                    />
+                </div>
+                <div className="form-group">
+                    <label>카카오톡 고객센터 URL (예: https://pf.kakao.com/_example)</label>
+                    <input
+                        type="url"
+                        name="kakaoUrl"
+                        value={info.kakaoUrl}
+                        onChange={handleChange}
+                        className="input"
+                        placeholder="https://..."
                     />
                 </div>
 

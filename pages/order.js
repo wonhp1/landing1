@@ -539,6 +539,28 @@ export default function OrderPage() {
                         <p>주소: {businessInfo.address}</p>
                         <p>전화: {businessInfo.phone} | 이메일: {businessInfo.email}</p>
                         <p>통신판매업신고: {businessInfo.ecommerceLicense}</p>
+                        {businessInfo.kakaoUrl && (
+                            <div style={{ marginTop: '15px' }}>
+                                <a
+                                    href={businessInfo.kakaoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        display: 'inline-block',
+                                        padding: '8px 16px',
+                                        backgroundColor: '#FEE500',
+                                        color: '#3C1E1E',
+                                        borderRadius: '20px',
+                                        fontSize: '13px',
+                                        fontWeight: 'bold',
+                                        textDecoration: 'none',
+                                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                    }}
+                                >
+                                    💬 카카오톡 고객센터로 문의하기
+                                </a>
+                            </div>
+                        )}
                     </div>
                 )}
             </footer>
