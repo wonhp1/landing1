@@ -24,6 +24,7 @@ export default function OrderPage() {
         request: ''  // 요청사항 (비필수)
     });
     const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+    const [isDaumScriptLoaded, setIsDaumScriptLoaded] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState('');
     const [toast, setToast] = useState(null);
@@ -50,6 +51,53 @@ export default function OrderPage() {
         fetchProducts();
         fetchBusinessInfo();
     }, []);
+
+    // Check if Daum Postcode script is loaded
+    useEffect(() => {
+        if (window.daum && window.daum.Postcode) {
+            setIsDaumScriptLoaded(true);
+            return;
+        }
+
+        const checkScript = setInterval(() => {
+            if (window.daum && window.daum.Postcode) {
+                setIsDaumScriptLoaded(true);
+                clearInterval(checkScript);
+            }
+        }, 100);
+
+        // Timeout after 10 seconds
+        const timeout = setTimeout(() => {
+            clearInterval(checkScript);
+        }, 10000);
+
+        return () => {
+            clearInterval(checkScript);
+            clearTimeout(timeout);
+        };
+    }, []);
+
+    // Lock body scroll when postcode modal is open
+    useEffect(() => {
+        if (isPostcodeOpen) {
+            // Save current scroll position
+            const scrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Restore scroll position
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.style.overflow = '';
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            }
+        }
+    }, [isPostcodeOpen]);
 
     const fetchBusinessInfo = async () => {
         try {
@@ -122,9 +170,9 @@ export default function OrderPage() {
     };
 
     const handleFindAddress = () => {
-        // 다음 주소 API가 로드되지 않은 경우
-        if (typeof window === 'undefined' || !window.daum || !window.daum.Postcode) {
-            alert('주소 검색 스크립트를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        // Check if script is loaded
+        if (!isDaumScriptLoaded || !window.daum || !window.daum.Postcode) {
+            alert('주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
             return;
         }
 
@@ -441,12 +489,13 @@ export default function OrderPage() {
                 style={{
                     display: 'none',
                     position: 'fixed',
-                    zIndex: 1000,
+                    zIndex: 9999,
                     top: 0,
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.4)'
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    pointerEvents: 'auto'
                 }}
                 onClick={(e) => {
                     if (e.target.id === 'daum-postcode-layer') {
@@ -461,13 +510,14 @@ export default function OrderPage() {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '100%',
+                        width: '90%',
                         maxWidth: '500px',
-                        height: '400px',
+                        height: '80vh',
+                        maxHeight: '600px',
                         backgroundColor: '#fff',
-                        borderRadius: '8px',
+                        borderRadius: '12px',
                         overflow: 'hidden',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
                     }}
                 >
                     <div id="daum-postcode-frame" style={{ width: '100%', height: '100%' }} />
