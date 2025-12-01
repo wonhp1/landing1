@@ -141,5 +141,24 @@
     "totalAmount": 3000,
     "status": "pending",
     "createdAt": "2025-11-30T11:30:00.279Z"
+  },
+  {
+    "id": "order-1764578446322",
+    "customerName": "김경원",
+    "customerPhone": "010-5620-9852",
+    "customerEmail": "",
+    "address": "(08738) 서울 관악구 관악로 186 (봉천동) ㄷ",
+    "request": "",
+    "products": [
+      {
+        "productId": "product-1764204891301",
+        "quantity": 1,
+        "name": "시나노골드 사과",
+        "price": 5000
+      }
+    ],
+    "totalAmount": 5000,
+    "status": "pending",
+    "createdAt": "2025-12-01T08:40:46.322Z"
   }
 ]

@@ -40,7 +40,8 @@ export default function ProductCard({ product, onSelect }) {
         <div className={styles.card}>
             {thumbnailUrl && (
                 <div className={styles.imageContainer}>
-                    <img src={thumbnailUrl} alt={product.name} />
+                    <img src={thumbnailUrl} alt="" className={styles.backgroundImage} />
+                    <img src={thumbnailUrl} alt={product.name} className={styles.mainImage} />
                 </div>
             )}
             <div className={styles.content}>
