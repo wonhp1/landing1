@@ -10,7 +10,7 @@ const NotionRenderer = dynamic(() => import('./NotionRenderer'), {
     loading: () => (
         <div style={{ padding: '40px', textAlign: 'center' }}>
             <div className="spinner"></div>
-            <p>Notion 콘텐츠를 불러오는 중...</p>
+            <p>상세페이지를 불러오는 중</p>
         </div>
     )
 });
