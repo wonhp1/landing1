@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useNotionCache } from '../contexts/NotionCacheContext';
+import { extractNotionPageId } from '../utils/prefetchUtils';
 import styles from '../styles/ProductDetailModal.module.css';
 
 // Dynamic import to avoid SSR issues with react-notion-x
@@ -19,6 +21,9 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
     const [notionData, setNotionData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    // Get global cache
+    const { getPage, cachePage } = useNotionCache();
 
     // Parse detail images from detailPageUrl (comma-separated)
     const detailImages = product?.detailPageUrl
@@ -62,24 +67,6 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
         return false;
     })();
 
-    // Extract clean page ID from various Notion URL formats
-    const getNotionPageId = (urlOrId) => {
-        if (!urlOrId) return null;
-
-        // Extract ID from notion.so or notion.site URLs
-        const match = urlOrId.match(/([a-f0-9]{32}|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i);
-        if (match) {
-            return match[1].replace(/-/g, '');
-        }
-
-        // If it's already a clean ID
-        if (/^[a-f0-9]{32}$/i.test(urlOrId.replace(/-/g, ''))) {
-            return urlOrId.replace(/-/g, '');
-        }
-
-        return null;
-    };
-
 
     // Fetch Notion content when modal opens (if it's a Notion page)
     useEffect(() => {
@@ -94,16 +81,28 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
     }, [isOpen, product?.detailPageUrl]);
 
     const fetchNotionContent = async () => {
-        setLoading(true);
         setError(null);
 
         try {
             // Extract clean page ID from URL
-            const pageId = getNotionPageId(product.detailPageUrl);
+            const pageId = extractNotionPageId(product.detailPageUrl);
 
             if (!pageId) {
                 throw new Error('유효하지 않은 Notion 페이지 URL입니다');
             }
+
+            // 🚀 Check global cache first
+            const cachedData = getPage(pageId);
+            if (cachedData) {
+                console.log(`⚡ Cache hit for page: ${product.name}`);
+                setNotionData(cachedData);
+                setLoading(false);
+                return; // Skip API call!
+            }
+
+            // Cache miss - fetch from API
+            console.log(`🔄 Cache miss - fetching page: ${product.name}`);
+            setLoading(true);
 
             const res = await fetch(`/api/notion/${encodeURIComponent(pageId)}`);
 
@@ -113,6 +112,9 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
             }
 
             const data = await res.json();
+
+            // Store in global cache
+            cachePage(pageId, data);
             setNotionData(data);
         } catch (err) {
             console.error('Error fetching Notion content:', err);
@@ -121,6 +123,7 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
             setLoading(false);
         }
     };
+
 
     if (!isOpen || !product) return null;
 

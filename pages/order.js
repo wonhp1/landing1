@@ -6,6 +6,8 @@ import Toast from '../components/Toast';
 import FloatingCartButton from '../components/FloatingCartButton';
 import PaymentModal from '../components/PaymentModal';
 import ProductDetailModal from '../components/ProductDetailModal';
+import { useNotionCache } from '../contexts/NotionCacheContext';
+import { prefetchWithPriority } from '../utils/prefetchUtils';
 import styles from '../styles/OrderPage.module.css';
 
 export default function OrderPage() {
@@ -34,6 +36,9 @@ export default function OrderPage() {
     const [selectedDetailProduct, setSelectedDetailProduct] = useState(null);
     const cartRef = useRef(null);
 
+    // Get global cache for prefetching
+    const cache = useNotionCache();
+
     const scrollToCart = () => {
         cartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
@@ -51,6 +56,39 @@ export default function OrderPage() {
         fetchProducts();
         fetchBusinessInfo();
     }, []);
+
+    // 🚀 Prefetch all product details when products are loaded
+    // Optimized: Waits for window load and idle state
+    useEffect(() => {
+        if (products.length > 0) {
+            const startPrefetch = () => {
+                // Use requestIdleCallback if available, otherwise setTimeout
+                if (window.requestIdleCallback) {
+                    window.requestIdleCallback(() => {
+                        prefetchAllProducts();
+                    }, { timeout: 5000 });
+                } else {
+                    setTimeout(prefetchAllProducts, 2000);
+                }
+            };
+
+            // Check if page is already loaded
+            if (document.readyState === 'complete') {
+                startPrefetch();
+            } else {
+                window.addEventListener('load', startPrefetch);
+                return () => window.removeEventListener('load', startPrefetch);
+            }
+        }
+    }, [products]);
+
+    const prefetchAllProducts = async () => {
+        console.log(`📦 Starting prefetch for ${products.length} products on order page...`);
+
+        // Prefetch with priority: first 6 products (visible on most screens) get priority
+        await prefetchWithPriority(products, 6, cache);
+    };
+
 
     // Check if Daum Postcode script is loaded
     useEffect(() => {

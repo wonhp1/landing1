@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNotionCache } from '../contexts/NotionCacheContext';
+import { extractNotionPageId } from '../utils/prefetchUtils';
 import styles from '../styles/ProductCard.module.css';
 
 export default function ProductCard({ product, onSelect }) {
     const [thumbnailUrl, setThumbnailUrl] = useState(null);
+    const { getImage, cacheImage } = useNotionCache();
 
     useEffect(() => {
         const fetchImage = async () => {
@@ -10,31 +13,42 @@ export default function ProductCard({ product, onSelect }) {
 
             // Check if it's a legacy image URL (comma separated or single)
             if (product.detailPageUrl.includes(',') || /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(product.detailPageUrl)) {
-                setThumbnailUrl(product.detailPageUrl.split(',')[0].trim());
+                const imageUrl = product.detailPageUrl.split(',')[0].trim();
+                setThumbnailUrl(imageUrl);
                 return;
             }
 
-            // It's likely a Notion URL - extract ID and fetch image
-            const match = product.detailPageUrl.match(/([a-f0-9]{32}|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i);
-            const pageId = match ? match[1].replace(/-/g, '') : null;
+            // Extract Notion page ID
+            const pageId = extractNotionPageId(product.detailPageUrl);
+            if (!pageId) return;
 
-            if (pageId) {
-                try {
-                    const res = await fetch(`/api/notion/image/${pageId}`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.imageUrl) {
-                            setThumbnailUrl(data.imageUrl);
-                        }
+            // 🚀 Check global cache first
+            const cachedUrl = getImage(pageId);
+            if (cachedUrl) {
+                console.log(`⚡ Cache hit for ${product.name}`);
+                setThumbnailUrl(cachedUrl);
+                return;
+            }
+
+            // Cache miss - fetch from API
+            try {
+                const res = await fetch(`/api/notion/image/${pageId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.imageUrl) {
+                        // Store in global cache
+                        cacheImage(pageId, data.imageUrl);
+                        setThumbnailUrl(data.imageUrl);
                     }
-                } catch (e) {
-                    console.error("Failed to fetch Notion thumbnail", e);
                 }
+            } catch (e) {
+                console.error("Failed to fetch Notion thumbnail", e);
             }
         };
 
         fetchImage();
-    }, [product.detailPageUrl]);
+    }, [product.detailPageUrl, getImage, cacheImage, product.name]);
+
 
     return (
         <div className={styles.card}>

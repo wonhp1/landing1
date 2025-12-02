@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useNotionCache } from '../contexts/NotionCacheContext';
+import { prefetchProducts } from '../utils/prefetchUtils';
 
 export default function Home() {
     const router = useRouter();
@@ -15,10 +17,34 @@ export default function Home() {
     const [selectedProductId, setSelectedProductId] = useState('');
     const [businessInfo, setBusinessInfo] = useState(null);
 
+    // Get global cache for prefetching
+    const cache = useNotionCache();
+
     useEffect(() => {
         fetchHomepageSettings();
         fetchBusinessInfo();
     }, []);
+
+    // 🚀 Prefetch products when they're loaded
+    useEffect(() => {
+        if (products.length > 0) {
+            const timer = setTimeout(() => {
+                prefetchHomePageProducts();
+            }, 1000); // Slightly longer delay on home page
+
+            return () => clearTimeout(timer);
+        }
+    }, [products]);
+
+    const prefetchHomePageProducts = async () => {
+        if (products.length === 0) return;
+
+        console.log(`🏠 Prefetching ${products.length} homepage products...`);
+        await prefetchProducts(products, cache, {
+            batchSize: 2,
+            delayBetweenBatches: 200
+        });
+    };
 
     const fetchHomepageSettings = async () => {
         try {
