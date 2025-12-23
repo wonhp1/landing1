@@ -12,7 +12,7 @@ export default async function handler(req, res) {
         });
     }
 
-    const secretKey = process.env.TOSS_SECRET_KEY || 'test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6';
+    const secretKey = process.env.TOSS_SECRET_KEY;
 
     try {
         // Call Toss Payments confirm API

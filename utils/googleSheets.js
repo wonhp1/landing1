@@ -181,14 +181,15 @@ export async function updateAllProducts(products) {
 }
 
 // 주문 내역을 구글 시트의 "order" 시트에 추가
+// 컬럼: A:timestamp, B:products, C:customerName, D:customerPhone, E:address, F:request, G:totalAmount, H:orderId, I:status, J:paymentKey, K:cancelReason
 export async function appendOrder(orderData) {
     try {
-        const { timestamp, products, customerName, customerPhone, address, request, totalAmount } = orderData;
+        const { timestamp, products, customerName, customerPhone, address, request, totalAmount, orderId, status, paymentKey } = orderData;
 
         // 주문상품을 문자열로 변환 (예: "사과 x 2, 배 x 1")
         const productStr = products.map(p => `${p.name} x ${p.quantity}`).join(', ');
 
-        // 시간, 주문상품, 이름, 전화번호, 주소, 요청사항, 매출
+        // A~K 컬럼
         const row = [
             timestamp || new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
             productStr,
@@ -196,12 +197,16 @@ export async function appendOrder(orderData) {
             customerPhone,
             address,
             request || '',
-            totalAmount || 0
+            totalAmount || 0,
+            orderId || '',
+            status || 'pending',
+            paymentKey || '',
+            '' // cancelReason (초기값 빈 문자열)
         ];
 
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'order!A:G', // A부터 G열까지 (매출 컬럼 추가)
+            range: 'order!A:K',
             valueInputOption: 'RAW',
             insertDataOption: 'INSERT_ROWS',
             requestBody: {
@@ -212,6 +217,138 @@ export async function appendOrder(orderData) {
         return true;
     } catch (error) {
         console.error('구글 시트에 주문 추가 중 오류 발생:', error);
+        return false;
+    }
+}
+
+// 모든 주문 조회 (관리자용)
+export async function getAllOrders() {
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'order!A2:K'
+        });
+
+        const rows = response.data.values;
+        if (!rows || rows.length === 0) {
+            return [];
+        }
+
+        const orders = rows.map((row, index) => ({
+            rowIndex: index + 2, // 실제 시트 행 번호 (헤더 제외)
+            createdAt: row[0] || '',
+            products: row[1] || '',
+            customerName: row[2] || '',
+            customerPhone: row[3] || '',
+            address: row[4] || '',
+            request: row[5] || '',
+            totalAmount: parseInt(row[6]) || 0,
+            id: row[7] || '',
+            status: row[8] || 'pending',
+            paymentKey: row[9] || '',
+            cancelReason: row[10] || ''
+        }));
+
+        // 최신순 정렬
+        return orders.reverse();
+    } catch (error) {
+        console.error('구글 시트에서 주문 조회 중 오류 발생:', error);
+        throw error;
+    }
+}
+
+// 전화번호로 주문 조회 (고객용 - paymentKey 제외)
+export async function getOrdersByPhone(phone) {
+    try {
+        const allOrders = await getAllOrders();
+
+        // 전화번호 정규화 (하이픈 제거)
+        const normalizedPhone = phone.replace(/[^0-9]/g, '');
+
+        const matchedOrders = allOrders.filter(order => {
+            const orderPhone = order.customerPhone.replace(/[^0-9]/g, '');
+            return orderPhone === normalizedPhone;
+        });
+
+        // paymentKey 제외하고 반환 (보안)
+        return matchedOrders.map(order => ({
+            id: order.id,
+            createdAt: order.createdAt,
+            products: order.products,
+            customerName: order.customerName,
+            customerPhone: order.customerPhone,
+            address: order.address,
+            request: order.request,
+            totalAmount: order.totalAmount,
+            status: order.status,
+            cancelReason: order.cancelReason,
+            hasPaymentKey: !!order.paymentKey
+        }));
+    } catch (error) {
+        console.error('전화번호로 주문 조회 중 오류 발생:', error);
+        throw error;
+    }
+}
+
+// 주문 ID로 조회 (내부용 - paymentKey 포함)
+export async function getOrderById(orderId) {
+    try {
+        const allOrders = await getAllOrders();
+        return allOrders.find(order => order.id === orderId) || null;
+    } catch (error) {
+        console.error('주문 ID로 조회 중 오류 발생:', error);
+        throw error;
+    }
+}
+
+// 주문 상태 업데이트
+export async function updateOrderStatus(orderId, status, cancelReason = '') {
+    try {
+        // 먼저 해당 주문의 행 번호 찾기
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'order!H2:H'
+        });
+
+        const rows = response.data.values;
+        if (!rows) {
+            return false;
+        }
+
+        // orderId가 있는 행 찾기
+        const rowIndex = rows.findIndex(row => row[0] === orderId);
+        if (rowIndex === -1) {
+            console.error('주문을 찾을 수 없습니다:', orderId);
+            return false;
+        }
+
+        const actualRow = rowIndex + 2; // 헤더 제외한 실제 행 번호
+
+        // I열(status) 업데이트
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `order!I${actualRow}`,
+            valueInputOption: 'RAW',
+            requestBody: {
+                values: [[status]]
+            }
+        });
+
+        // K열(cancelReason) 업데이트 (취소 사유가 있는 경우만)
+        if (cancelReason) {
+            await sheets.spreadsheets.values.update({
+                spreadsheetId: SPREADSHEET_ID,
+                range: `order!K${actualRow}`,
+                valueInputOption: 'RAW',
+                requestBody: {
+                    values: [[cancelReason]]
+                }
+            });
+        }
+
+        return true;
+    } catch (error) {
+        console.error('주문 상태 업데이트 중 오류 발생:', error);
         return false;
     }
 }

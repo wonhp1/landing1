@@ -1,17 +1,22 @@
-import { readData, writeData } from '../../../utils/storage';
+import { readData } from '../../../utils/storage';
 import { requireAuth } from '../../../middleware/adminAuth';
+import { appendOrder, getAllOrders } from '../../../utils/googleSheets';
 
 async function handler(req, res) {
-    const orders = readData('orders.json');
-
     if (req.method === 'GET') {
-        // 모든 주문 조회 (관리자 전용)
-        return res.status(200).json(orders);
+        // 모든 주문 조회 (관리자 전용) - Google Sheets에서 조회
+        try {
+            const orders = await getAllOrders();
+            return res.status(200).json(orders);
+        } catch (error) {
+            console.error('주문 조회 실패:', error);
+            return res.status(500).json({ error: '주문 조회에 실패했습니다.' });
+        }
     }
 
     if (req.method === 'POST') {
         // 새 주문 생성 (공개)
-        const { customerName, customerPhone, customerEmail, products, address, request } = req.body;
+        const { customerName, customerPhone, customerEmail, products, address, request, paymentKey, orderId: tossOrderId } = req.body;
 
         if (!customerName || !customerPhone || !products || products.length === 0) {
             return res.status(400).json({ error: '필수 정보를 입력해주세요.' });
@@ -37,26 +42,10 @@ async function handler(req, res) {
         }
 
         const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+        const orderId = tossOrderId || `order-${Date.now()}`;
 
-        const newOrder = {
-            id: `order-${Date.now()}`,
-            customerName,
-            customerPhone,
-            customerEmail: customerEmail || '',
-            address: address || '',
-            request: request || '',
-            products: enrichedProducts,
-            totalAmount,
-            status: 'pending',
-            createdAt: new Date().toISOString()
-        };
-
-        orders.push(newOrder);
-        writeData('orders.json', orders);
-
-        // 구글 시트에 주문 추가 (비동기, 실패해도 주문은 저장됨)
+        // Google Sheets에 주문 저장 (메인 DB)
         try {
-            const { appendOrder } = await import('../../../utils/googleSheets');
             await appendOrder({
                 timestamp,
                 products: enrichedProducts,
@@ -64,13 +53,26 @@ async function handler(req, res) {
                 customerPhone,
                 address,
                 request: request || '',
-                totalAmount
+                totalAmount,
+                orderId,
+                status: 'pending',
+                paymentKey: paymentKey || ''
+            });
+
+            return res.status(201).json({
+                id: orderId,
+                customerName,
+                customerPhone,
+                address,
+                products: enrichedProducts,
+                totalAmount,
+                status: 'pending',
+                createdAt: timestamp
             });
         } catch (error) {
-            console.error('구글 시트 저장 실패 (주문은 로컬에 저장됨):', error);
+            console.error('주문 저장 실패:', error);
+            return res.status(500).json({ error: '주문 저장에 실패했습니다.' });
         }
-
-        return res.status(201).json(newOrder);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import Script from 'next/script';
 import ProductCard from '../components/ProductCard';
 import Toast from '../components/Toast';
@@ -366,7 +367,14 @@ export default function OrderPage() {
                 src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
                 strategy="lazyOnload"
             />
-            <h1>주문하기</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <h1 style={{ margin: 0 }}>주문하기</h1>
+                <Link href="/myorders">
+                    <button className="button" style={{ backgroundColor: '#666', borderColor: '#666', padding: '10px 20px' }}>
+                        주문 확인하기
+                    </button>
+                </Link>
+            </div>
 
             <h2 style={{ marginTop: '40px' }}>상품 선택</h2>
 

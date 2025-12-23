@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from '../styles/PaymentModal.module.css';
 
-const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm'; // Toss Payments Payment Widget Test Client Key
-const customerKey = 'test_customer_key_' + Math.random().toString(36).substring(2, 15); // Random customer key for testing
+const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
+const customerKey = 'customer_' + Math.random().toString(36).substring(2, 15);
 
 export default function PaymentModal({ isOpen, onClose, amount, orderId, orderName, customerName, customerEmail, customerMobilePhone, products, customerInfo }) {
     const [paymentWidget, setPaymentWidget] = useState(null);

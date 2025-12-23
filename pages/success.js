@@ -66,6 +66,8 @@ export default function SuccessPage() {
                         address: `${tempOrder.customerInfo.postcode ? `(${tempOrder.customerInfo.postcode}) ` : ''}${tempOrder.customerInfo.mainAddress || ''} ${tempOrder.customerInfo.detailAddress || ''}`.trim(),
                         request: tempOrder.customerInfo.request || '',
                         products: tempOrder.products.map(p => ({ productId: p.productId, quantity: p.quantity })),
+                        paymentKey: paymentKey,
+                        orderId: orderId,
                     }),
                 });
 

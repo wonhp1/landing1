@@ -171,10 +171,15 @@ export default function Home() {
                     </div>
                 )}
 
-                <div style={{ marginTop: '30px' }}>
+                <div style={{ marginTop: '30px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
                     <Link href="/order">
                         <button className="button" style={{ fontSize: '18px', padding: '16px 32px' }}>
                             주문하기
+                        </button>
+                    </Link>
+                    <Link href="/myorders">
+                        <button className="button" style={{ fontSize: '18px', padding: '16px 32px', backgroundColor: '#666', borderColor: '#666' }}>
+                            주문 확인하기
                         </button>
                     </Link>
                 </div>

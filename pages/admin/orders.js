@@ -100,7 +100,7 @@ export default function AdminOrders() {
                                     <strong>주문 번호:</strong> {order.id}
                                 </div>
                                 <div>
-                                    <strong>주문 시간:</strong> {new Date(order.createdAt).toLocaleString('ko-KR')}
+                                    <strong>주문 시간:</strong> {order.createdAt}
                                 </div>
                             </div>
 
@@ -116,11 +116,15 @@ export default function AdminOrders() {
 
                             <div style={{ marginBottom: '16px' }}>
                                 <strong>주문 상품:</strong>
-                                {order.products.map((item, idx) => (
-                                    <div key={idx} style={{ marginTop: '8px', color: '#666' }}>
-                                        {getProductName(item.productId)} x {item.quantity}
-                                    </div>
-                                ))}
+                                {typeof order.products === 'string' ? (
+                                    <div style={{ marginTop: '8px', color: '#666' }}>{order.products}</div>
+                                ) : (
+                                    order.products?.map((item, idx) => (
+                                        <div key={idx} style={{ marginTop: '8px', color: '#666' }}>
+                                            {item.name || getProductName(item.productId)} x {item.quantity}
+                                        </div>
+                                    ))
+                                )}
                             </div>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #eee' }}>
